@@ -10,7 +10,7 @@ namespace BusinessValidation
 {
     [DebuggerDisplay("{ShowCounts,nq}")]
     /// <summary>
-    /// 
+    /// A class for executing validation rules and collecting failures.
     /// </summary>
     public class Validator
     {
@@ -313,48 +313,6 @@ namespace BusinessValidation
                 throw new ValidationFailureException(ValidationFailures);
         }
 
-
-        // Convenience Creation methods. Note: these pretty much go out the window if people create classes derived from this class. But 
-
-        public static Validator CreateWithFailure(string failBundle, string failureMessage)
-        {
-            var validator = new Validator();
-
-            validator.AddFailure(failBundle, failureMessage);
-
-            return validator;
-        }
-
-        public static Validator CreateForCondition(string failBundle, string failureMessage, bool condition)
-        {
-            var Validator = new Validator();
-            Validator.Validate(failBundle, failureMessage, condition);
-            return Validator;
-        }
-
-        public static Validator CreateForPredicate<T>(string failBundle, string failureMessage, T objectValidate, Func<T, bool> predicate)
-            where T : class
-        {
-            var Validator = new Validator();
-
-            Validator.Validate<T>(failBundle, failureMessage, objectValidate, predicate);
-
-            return Validator;
-        }
-
-        public static Validator CreateForPredicate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectValidate, Func<T, bool> predicate)
-            where T : class
-        {
-            var Validator = new Validator();
-
-            Validator.Validate(expression, failureMessage, objectValidate, predicate);
-
-            return Validator;
-        }
-
-
-
-
 #if DEBUG
         protected string ShowCounts
         {
@@ -364,15 +322,5 @@ namespace BusinessValidation
             }
         }
 #endif
-        // EXPERIMENTAL
-        public Action<string> CreateFailBundleCapture(string failBundle)
-        {
-            return failMessage => AddFailure(failBundle, failMessage);
-        }
-
-        public Action<string, bool> CreateFailBundleValidator(string failBundle)
-        {
-            return (failMessage, condition) => Validate(failBundle, failMessage, condition);
-        }
     }
 }
