@@ -45,7 +45,7 @@ namespace BusinessValidation
             }
         }
 
-        internal virtual ValidationFailureCollection Results { get; }
+        internal ValidationFailureCollection Results { get; }
 
         /// <summary>
         /// Adds a validation failure to the collection.
@@ -55,7 +55,7 @@ namespace BusinessValidation
         /// <returns>The <see cref="Validator"/> object to enable chaining.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public virtual Validator AddFailure(string failBundle, string failureMessage)
+        public Validator AddFailure(string failBundle, string failureMessage)
         {
             if (failureMessage is null) throw new ArgumentNullException(nameof(failureMessage));
             if (string.IsNullOrWhiteSpace(failureMessage)) throw new ArgumentException($"'{nameof(failureMessage)}' cannot be whitespace.", nameof(failureMessage));
@@ -74,7 +74,7 @@ namespace BusinessValidation
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public virtual bool Validate(string failBundle, string failureMessage, bool condition)
+        public bool Validate(string failBundle, string failureMessage, bool condition)
         {
             if (failureMessage is null) throw new ArgumentNullException(nameof(failureMessage));
             if (string.IsNullOrWhiteSpace(failureMessage)) throw new ArgumentException($"'{nameof(failureMessage)}' cannot be whitespace.", nameof(failureMessage));
@@ -98,7 +98,7 @@ namespace BusinessValidation
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="failureMessage"/> or <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public virtual bool Validate<T>(string failBundle, string failureMessage, T objectToValidate, Func<T, bool> predicate)
+        public bool Validate<T>(string failBundle, string failureMessage, T objectToValidate, Func<T, bool> predicate)
             where T : class
         {
             if (objectToValidate is null) throw new ArgumentNullException(nameof(objectToValidate));
@@ -127,7 +127,7 @@ namespace BusinessValidation
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="objectToValidate"/> or <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public virtual bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, bool condition)
+        public bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, bool condition)
             where T : class
         {
             if (objectToValidate is null) throw new ArgumentNullException(nameof(objectToValidate));
@@ -170,7 +170,7 @@ namespace BusinessValidation
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="objectToValidate"/> or <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public virtual bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, Func<T, bool> predicate)
+        public bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, Func<T, bool> predicate)
             where T : class
         {
             if (objectToValidate is null) throw new ArgumentNullException(nameof(objectToValidate));
@@ -205,31 +205,31 @@ namespace BusinessValidation
         /// <summary>
         /// The collection of validation failures, all collated by fail bundle.
         /// </summary>
-        public virtual IReadOnlyDictionary<string, IReadOnlyList<string>> ValidationFailures => new ReadOnlyDictionary<string, IReadOnlyList<string>>(Results.ToDictionary());
+        public IReadOnlyDictionary<string, IReadOnlyList<string>> ValidationFailures => new ReadOnlyDictionary<string, IReadOnlyList<string>>(Results.ToDictionary());
 
         /// <summary>
         /// The raw validation messages, not grouped by fail bundle.
         /// </summary>
-        public virtual IReadOnlyList<string> ValidationMessages => Results.ValidationMessages();
+        public IReadOnlyList<string> ValidationMessages => Results.ValidationMessages();
 
         /// <summary>
         /// Indicates whether validation passed.
         /// </summary>
         /// <returns>A <see cref="Boolean"/> representing whether the validator object is valid.</returns>
-        public virtual bool IsValid() => Results.FailCount < 1;
+        public bool IsValid() => Results.FailCount < 1;
 
         /// <summary>
         /// Indicates whether validation failed.
         /// </summary>
         /// <returns>A <see cref="Boolean"/> representing whether the validator object is invalid.</returns>
-        public virtual bool NotValid() => Results.FailCount > 0;
+        public bool NotValid() => Results.FailCount > 0;
 
         /// <summary>
         /// Merges one <see cref="Validator"/> object with another.
         /// </summary>
         /// <param name="other">Another <see cref="Validator"/> object to merge with the one invoking this method.</param>
         /// <returns>The <see cref="Validator"/> object to enable chaining.</returns>
-        public virtual Validator Merge(Validator other)
+        public Validator Merge(Validator other)
         {
             if (other is null || other.IsValid())
                 return this;
@@ -295,7 +295,7 @@ namespace BusinessValidation
         /// </summary>
         /// <param name="index">Index of item to retrieve.</param>
         /// <returns>List of failure messages for the fail-bundle.</returns>
-        public virtual IReadOnlyList<string> this[string index]
+        public IReadOnlyList<string> this[string index]
         {
             get
             {
@@ -356,7 +356,7 @@ namespace BusinessValidation
 
 
 #if DEBUG
-        protected virtual string ShowCounts
+        protected string ShowCounts
         {
             get
             {
