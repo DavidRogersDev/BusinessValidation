@@ -4,6 +4,9 @@ using System.Diagnostics;
 
 namespace Demo.Console.Services
 {
+    /// <summary>
+    /// In this sample service, validation is externalised to a separate validator class which is injected via its abstraction.
+    /// </summary>
     public class EnrollmentService : IEnrollmentService
     {
         private readonly IEnrolmentAttemptValidator _enrolmentAttemptValidator;
@@ -19,41 +22,19 @@ namespace Demo.Console.Services
             var isEligibleValidator = _enrolmentAttemptValidator.IsEligible(unitCode, studentId);
             var isFinancialValidator = _enrolmentAttemptValidator.IsFinancial(studentId);
 
-            isEligibleValidator.AddFailure("EnrolmentIssue", "Student is not eligible")
-                .AddFailure("EnrolmentIssue", "Student already enrolled")
-                .AddFailure("StudentFeesOwing", "Student has not paid fees");
-                ;
-
             var isValid = isEnrolledValidator
                 .Merge(isEligibleValidator)
                 .Merge(isFinancialValidator);
 
-            if(isValid)
-            {
-                //  continue enrollment opeeration ...
-            }
+            IReadOnlyList<string> enrollmentIssues = isValid["EnrolmentIssue"]; // example of using the validator's indexer to access a particular fail-bundle
+            Trace.WriteLine(enrollmentIssues[0]);
+            Trace.WriteLine(enrollmentIssues[1]);
 
             isValid.Throw();
 
-            return false; // never reached, but required by compiler.
-        }
+            //  continue enrollment opeeration ...
 
-        private bool IsEnrolled(string unitCode, string studentId)
-        {
-            // fake a db call and pretend student is already enrolled in unit.
-            return true;
-        }
-        
-        private bool IsEligible(string unitCode, string studentId)
-        {
-            // fake a db call and pretend student is not eligible.
-            return false;
-        }
-
-        private bool IsFinancial(string studentId)
-        {
-            // fake a db call and pretend student is not eligible.
-            return false;
+            return isValid; // never reached, but required by compiler.
         }
     }
 }
