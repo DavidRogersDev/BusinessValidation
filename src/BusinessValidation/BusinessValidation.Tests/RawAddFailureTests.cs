@@ -48,6 +48,7 @@ namespace BusinessValidation.Tests
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
             validator.IsValid().Should().BeFalse();
+            ((bool)validator).Should().BeFalse();
         }
         
         [Fact]
@@ -71,15 +72,24 @@ namespace BusinessValidation.Tests
         }
         
         [Fact]
+        public void Failure_Should_Be_Accessible_By_Indexer()
+        {
+            var validator = new Validator();
+
+            validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
+
+            validator[FailBundleName].Count.Should().Be(1);
+            validator[FailBundleName].Should().Contain(NotRightNameErrorMessage);
+        }
+        
+        [Fact]
         public void Add_Failure_Should_Add_FailMessage_To_Bundle()
         {
             var validator = new Validator();
 
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
-            validator.ValidationFailures
-                .Where(b => b.Key == FailBundleName)
-                .SelectMany(v => v.Value)
+            validator[FailBundleName]                
                 .Single()
                 .Should()
                 .Be(NotRightNameErrorMessage);
@@ -118,6 +128,8 @@ namespace BusinessValidation.Tests
             validator.AddFailure(FailBundleAge, FailureMessage.PersonTooYoung);
 
             validator.ValidationMessages.Count().Should().Be(2);
+            validator.ValidationMessages.Should().Contain(NotRightNameErrorMessage);
+            validator.ValidationMessages.Should().Contain(FailureMessage.PersonTooYoung);
         }
         
         [Fact]
@@ -148,7 +160,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.AddFailure(ValidationInvariables.FailBundle.NullFailBundle, NotRightNameErrorMessage))
+            validator.Invoking(v => v.AddFailure(FailBundle.NullFailBundle, NotRightNameErrorMessage))
                 .Should()
                 .Throw<ArgumentNullException>();
         }

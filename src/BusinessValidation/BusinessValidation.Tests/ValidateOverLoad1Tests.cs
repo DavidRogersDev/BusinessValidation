@@ -97,5 +97,18 @@ namespace BusinessValidation.Tests
             )).Should()
             .Throw<ArgumentException>();
         }
+        
+        [Fact]
+        public void Add_Empty_FailMessage_Throws_Exception()
+        {
+            var validator = new Validator();
+
+            validator.Invoking(v => v.Validate(
+                FailBundle.Email,
+                string.Empty,
+                GenericTestData.VeryShortName.Length > 2
+            )).Should()
+            .Throw<ArgumentException>();
+        }
     }
 }

@@ -42,6 +42,40 @@ namespace BusinessValidation.Tests
         }
 
         [Fact]
+        public void Validate_Returns_True_When_Passes()
+        {
+            var validator = new Validator();
+
+            var bob = LecturerBuilder.Simple().Build();
+
+            var isValid = validator.Validate(
+                l => l.EmailAddress,
+                FailureMessage.NotRightNameEmail,
+                bob,
+                bob.FirstName.Equals(LecturerBuilder.LecturerFirstName)
+                );
+
+            isValid.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Validate_Returns_False_When_Fails()
+        {
+            var validator = new Validator();
+
+            var bob = LecturerBuilder.Simple().Build();
+
+            var isValid = validator.Validate(
+                l => l.EmailAddress,
+                FailureMessage.NotRightNameEmail,
+                bob,
+                bob.EmailAddress.EndsWith(GenericTestData.AnuUniSuffix)
+                );
+
+            isValid.Should().BeFalse();
+        }
+
+        [Fact]
         public void Validate_Null_Object_Throws_ArgumentNullException()
         {
             var validator = new Validator();
@@ -84,6 +118,22 @@ namespace BusinessValidation.Tests
             validator.Invoking(v => v.Validate(
                 b => b.EmailAddress,
                 "      ",
+                bob,
+                bob.FirstName.Length > 4
+            )).Should()
+            .Throw<ArgumentException>();
+        }
+
+        [Fact]
+        public void Add_Empty_FailMessage_Throws_Exception()
+        {
+            var validator = new Validator();
+
+            var bob = LecturerBuilder.Simple().Build();
+
+            validator.Invoking(v => v.Validate(
+                b => b.EmailAddress,
+                string.Empty,
                 bob,
                 bob.FirstName.Length > 4
             )).Should()
