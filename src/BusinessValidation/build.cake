@@ -47,9 +47,7 @@ Task("NugetPackIt")
                                      Owners                  = new[] {"David Rogers"},
                                      Description             = "A library to perform validation in business services and give a mechanism to report failures back to the user interface.",
                                      Summary                 = "A Business Services Validator.",
-                                     ProjectUrl              = new Uri("https://github.com/DavidRogersDev/BusinessValidation"),
-                                     IconUrl                 = new Uri("https://en.gravatar.com/avatar/57f1a2fb6cfc8dca179a43ad6dbbde94"),
-                                     LicenseUrl              = new Uri("https://github.com/DavidRogersDev/BusinessValidation/blob/main/LICENSE"),
+                                     ProjectUrl              = new Uri("https://github.com/DavidRogersDev/BusinessValidation"),                                     
                                      Copyright               = "David Rogers 2022",
                                      ReleaseNotes            = new [] {"Release to market."},
                                      Tags                    = new [] {"BusinessValidation", "Validation", "Validator", "Validators"},
@@ -57,13 +55,14 @@ Task("NugetPackIt")
                                      Symbols                 = false,
                                      NoPackageAnalysis       = true,
                                      Files                   = new [] {
-                                                                          new NuSpecContent {Source = "BusinessValidation.dll", Target = "lib/netstandard2.1"},
-																		  new NuSpecContent {Source = "BusinessValidation.pdb", Target = "lib/netstandard2.1"}
+												new NuSpecContent {Source = "BusinessValidation.dll", Target = "lib/netstandard2.1"},
+												new NuSpecContent {Source = "BusinessValidation.pdb", Target = "lib/netstandard2.1"},
+												new NuSpecContent {Source = "./../../../../icon.png"},
                                                                        },
                                      BasePath                = "./BusinessValidation/bin/Release/netstandard2.1",
                                      OutputDirectory         = "./NuGet"
                                  };	
-	NuGetPack(nuGetPackSettings);
+	NuGetPack("BusinessValidation.nuspec", nuGetPackSettings);
 });
 
 //////////////////////////////////////////////////////////////////////

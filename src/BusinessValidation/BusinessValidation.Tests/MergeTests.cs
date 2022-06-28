@@ -1,6 +1,4 @@
 ﻿using FluentAssertions;
-using System;
-using System.Linq;
 
 namespace BusinessValidation.Tests
 {
@@ -8,7 +6,7 @@ namespace BusinessValidation.Tests
     {
         private Validator validatorFirst;
         private Validator validatorSecond;
-        private Validator validatorNull;
+        private Validator validatorNull = null;
         const string UserNameEmptyMessage = "UserName was empty";
         const string UserNameAlreadyTakenMessage = "UserName was already taken";
         const string UserNameFailBundleName = "UserName";

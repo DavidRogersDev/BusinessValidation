@@ -74,6 +74,59 @@ namespace BusinessValidation.Tests
 
             isValid.Should().BeFalse();
         }
+        
+        [Fact]
+        public void Full_Path_Added_As_Failbundle_Name_As_Default()
+        {
+            var validator = new Validator();
+
+            var bob = LecturerBuilder.SimpleWithAddress().Build();
+
+            validator.Validate(
+                l => l.Address.PostCode,
+                FailureMessage.PostCodeTooFar,
+                bob,
+                bob.Address.PostCode > 5000
+                );
+
+            validator.ValidationFailures.Single().Key.Should().Be(FailBundle.AddressPostcode);
+        }
+        
+        [Fact]
+        public void Fullpath_Enum_Adds_Full_Path_As_Failbundle_Name()
+        {
+            var validator = new Validator();
+
+            var bob = LecturerBuilder.SimpleWithAddress().Build();
+
+            validator.Validate(
+                l => l.Address.PostCode,
+                FailureMessage.PostCodeTooFar,
+                bob,
+                bob.Address.PostCode > 5000,
+                PropertyDepth.FullPath
+                );
+
+            validator.ValidationFailures.Single().Key.Should().Be(FailBundle.AddressPostcode);
+        }
+        
+        [Fact]
+        public void TerminatingProperty_Enum_Adds_Full_Path_As_Failbundle_Name()
+        {
+            var validator = new Validator();
+
+            var bob = LecturerBuilder.SimpleWithAddress().Build();
+
+            validator.Validate(
+                l => l.Address.PostCode,
+                FailureMessage.PostCodeTooFar,
+                bob,
+                bob.Address.PostCode > 5000,
+                PropertyDepth.TerminatingProperty
+                );
+
+            validator.ValidationFailures.Single().Key.Should().Be(FailBundle.PostCode);
+        }
 
         [Fact]
         public void Validate_Null_Object_Throws_ArgumentNullException()

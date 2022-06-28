@@ -124,17 +124,18 @@ namespace BusinessValidation
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="objectToValidate">An object of the given type <typeparamref name="T"/> to validate.</param>
         /// <param name="condition">The condition, or business rule, to validate.</param>
+        /// <param name="propertyDepth">An enum of type <see cref="PropertyDepth" /> specifying whether the fullpath, or the terminating property, of the lambda in the first argument be added as the name of the fail-bundle. Fullpath is the default. E.g. if the lambda is p => p.Person.Address.Suburb, the name added will be "Person.Address.Suburb".</param>
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="objectToValidate"/> or <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, bool condition)
+        public bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, bool condition, PropertyDepth propertyDepth = PropertyDepth.FullPath)
             where T : class
         {
             if (objectToValidate is null) throw new ArgumentNullException(nameof(objectToValidate));
             if (failureMessage is null) throw new ArgumentNullException(nameof(failureMessage));
             if (string.IsNullOrWhiteSpace(failureMessage)) throw new ArgumentException($"'{nameof(failureMessage)}' cannot be whitespace.", nameof(failureMessage));
 
-            var path = expression.ToPropertyPath();
+            var path = ExtractPath(expression, propertyDepth);
 
             var failBundleToken = "{{fail-bundle}}";
             var failBundleTokenEscaped = "{fail-bundle}";
@@ -167,17 +168,18 @@ namespace BusinessValidation
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="objectToValidate">An object of the given type <typeparamref name="T"/> to validate.</param>
         /// <param name="predicate">A func delegate of type <see cref="T:Func&lt;T, Boolean&gt;" /> providing a condition typed to an object of type <typeparamref name="T"/> for validation of that object.</param>
+        /// <param name="propertyDepth">An enum of type <see cref="PropertyDepth" /> specifying whether the fullpath, or the terminating property, of the lambda in the first argument be added as the name of the fail-bundle. Fullpath is the default. E.g. if the lambda is p => p.Person.Address.Suburb, the name added will be "Person.Address.Suburb".</param>
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="objectToValidate"/> or <paramref name="failureMessage"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
-        public bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, Func<T, bool> predicate)
+        public bool Validate<T, TM>(Expression<Func<T, TM>> expression, string failureMessage, T objectToValidate, Func<T, bool> predicate, PropertyDepth propertyDepth = PropertyDepth.FullPath)
             where T : class
         {
             if (objectToValidate is null) throw new ArgumentNullException(nameof(objectToValidate));
             if (failureMessage is null) throw new ArgumentNullException(nameof(failureMessage));
             if (string.IsNullOrWhiteSpace(failureMessage)) throw new ArgumentException($"'{nameof(failureMessage)}' cannot be whitespace.", nameof(failureMessage));
 
-            var path = expression.ToPropertyPath();
+            var path = ExtractPath(expression, propertyDepth);
 
             var failBundleToken = "{{fail-bundle}}";
             var failBundleTokenEscaped = "{fail-bundle}";
@@ -314,7 +316,7 @@ namespace BusinessValidation
         }
 
 #if DEBUG
-        protected string ShowCounts
+        private string ShowCounts
         {
             get
             {
@@ -322,5 +324,12 @@ namespace BusinessValidation
             }
         }
 #endif
+
+        private static string ExtractPath<T,TM>(Expression<Func<T, TM>> expression, PropertyDepth propertyDepth) => propertyDepth switch
+        {
+            PropertyDepth.TerminatingProperty => expression.ToTerminatingProperty(),
+            PropertyDepth.FullPath => expression.ToPropertyPath(),
+            _ => throw new ArgumentOutOfRangeException(nameof(propertyDepth), $"Not a valid propertyDepth value: {propertyDepth}"),
+        };
     }
 }

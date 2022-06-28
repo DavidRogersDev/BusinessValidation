@@ -1,7 +1,4 @@
 using FluentAssertions;
-using System;
-using System.Linq;
-using Xunit;
 using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
@@ -170,9 +167,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            string message = null;
-
-            validator.Invoking(v => v.AddFailure(FailBundleName, message))
+            validator.Invoking(v => v.AddFailure(FailBundleName, FailureMessage.MessageIsNullValue))
                 .Should()
                 .Throw<ArgumentNullException>();
         }

@@ -1,12 +1,31 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 
 namespace BusinessValidation
 {
-    public static class ExpressionExtensions
+    internal static class ExpressionExtensions
     {
-        public static string ToPropertyPath<TObj, TRet>(this Expression<Func<TObj, TRet>> source)
+        internal static string ToTerminatingProperty<TObj, TRet>(this Expression<Func<TObj, TRet>> source)
+        {
+            var lambda = (LambdaExpression)source;
+            MemberExpression memberExpression;
+
+            if (lambda.Body is UnaryExpression)
+            {
+                var unaryExpression = (UnaryExpression)(lambda.Body);
+                memberExpression = (MemberExpression)(unaryExpression.Operand);
+            }
+            else
+            {
+                memberExpression = (MemberExpression)(lambda.Body);
+            }
+
+            return ((PropertyInfo)memberExpression.Member).Name;
+        }
+
+        internal static string ToPropertyPath<TObj, TRet>(this Expression<Func<TObj, TRet>> source)
         {
             var path = new StringBuilder();
 
@@ -27,7 +46,7 @@ namespace BusinessValidation
             return path.ToString();
         }
 
-        public static MemberExpression GetMemberExpression(Expression expression)
+        internal static MemberExpression GetMemberExpression(Expression expression)
         {
             if (expression is MemberExpression)
             {
