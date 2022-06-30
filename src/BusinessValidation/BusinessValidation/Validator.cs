@@ -315,7 +315,6 @@ namespace BusinessValidation
                 throw new ValidationFailureException(ValidationFailures);
         }
 
-#if DEBUG
         private string ShowCounts
         {
             get
@@ -323,7 +322,6 @@ namespace BusinessValidation
                 return $"Failure Count ➡️ {Results.FailCount}, Message Count ➡️ {Results.MessageCount}";
             }
         }
-#endif
 
         private static string ExtractPath<T,TM>(Expression<Func<T, TM>> expression, PropertyDepth propertyDepth) => propertyDepth switch
         {
