@@ -309,7 +309,18 @@ namespace BusinessValidation
         /// Throws a custom exception to make the validation failures available to a higher layer in the application flow.
         /// </summary>
         /// <exception cref="ValidationFailureException"></exception>
+        [Obsolete("Throw was poorly named and will be deprecated. Please use ThrowIfInvalid, which does the same thing.")]
         public void Throw()
+        {
+            if (!this)
+                throw new ValidationFailureException(ValidationFailures);
+        }
+        
+        /// <summary>
+        /// Throws a custom exception to make the validation failures available to a higher layer in the application flow.
+        /// </summary>
+        /// <exception cref="ValidationFailureException"></exception>
+        public void ThrowIfInvalid()
         {
             if (!this)
                 throw new ValidationFailureException(ValidationFailures);
