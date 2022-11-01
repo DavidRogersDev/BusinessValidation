@@ -53,11 +53,18 @@ Task("NugetPackIt")
                                      Symbols                 = false,
                                      NoPackageAnalysis       = true,
                                      Files                   = new [] {
-												new NuSpecContent {Source = "BusinessValidation.dll", Target = "lib/netstandard2.1"},
-												new NuSpecContent {Source = "BusinessValidation.pdb", Target = "lib/netstandard2.1"},
-												new NuSpecContent {Source = "./../../../../icon.png"},
-                                                                       },
-                                     BasePath                = "./BusinessValidation/bin/Release/netstandard2.1",
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/netstandard2.1/BusinessValidation.dll", Target = "lib/netstandard2.1"},
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/netstandard2.1/BusinessValidation.pdb", Target = "lib/netstandard2.1"},
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/netcoreapp3.0/BusinessValidation.dll", Target = "lib/netcoreapp3.0"},												
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/netcoreapp3.0/BusinessValidation.pdb", Target = "lib/netcoreapp3.0"},
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/netcoreapp3.1/BusinessValidation.dll", Target = "lib/netcoreapp3.1"},												
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/netcoreapp3.1/BusinessValidation.pdb", Target = "lib/netcoreapp3.1"},											
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/net5.0/BusinessValidation.dll", Target = "lib/net5.0"},												
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/net5.0/BusinessValidation.pdb", Target = "lib/net5.0"},
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/net6.0/BusinessValidation.dll", Target = "lib/net6.0"},												
+												new NuSpecContent {Source = "./BusinessValidation/bin/Release/net6.0/BusinessValidation.pdb", Target = "lib/net6.0"},
+												new NuSpecContent {Source = "./icon.png"},
+                                                                       },                  
                                      OutputDirectory         = "./NuGet"
                                  };	
 	NuGetPack("BusinessValidation.nuspec", nuGetPackSettings);
