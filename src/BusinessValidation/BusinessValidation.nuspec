@@ -3,6 +3,6 @@
   <metadata>
     <license type="expression">MIT</license>    
 	<icon>icon.png</icon>
-    <repository type="git" url="https://github.com/DavidRogersDev/BusinessValidation.git" commit="*******" branch="main" />
+    <repository type="git" url="https://github.com/DavidRogersDev/BusinessValidation.git" commit="1de42bebc9dc1d213dff5f51bd75d7b544f59fc0" branch="main" />
   </metadata>
 </package>

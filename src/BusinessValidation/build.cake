@@ -41,13 +41,13 @@ Task("NugetPackIt")
 {
      var nuGetPackSettings   = new NuGetPackSettings {
                                      Id                      = "BusinessValidation",
-                                     Version                 = "1.0.1.0",
+                                     Version                 = "1.0.2.0",
                                      Title                   = "BusinessValidation",
                                      Authors                 = new[] {"David Rogers"},
                                      Description             = "A library to perform validation in business services and give a mechanism to report failures back to the user interface.",
                                      ProjectUrl              = new Uri("https://github.com/DavidRogersDev/BusinessValidation"),                                     
                                      Copyright               = "David Rogers 2022",
-                                     ReleaseNotes            = new [] {"Issue #1 fix. Minor bug. Debugger display will now provide a text representation of the Validator in debugging mode."},
+                                     ReleaseNotes            = new [] {"Refactored inner collection type. Replaced Throw method with ThrowIfInvalid. Added more target frameworks."},
                                      Tags                    = new [] {"BusinessValidation", "Validation", "Validator", "Validators"},
                                      RequireLicenseAcceptance= false,
                                      Symbols                 = false,
