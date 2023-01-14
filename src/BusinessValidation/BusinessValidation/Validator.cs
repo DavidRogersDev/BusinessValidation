@@ -326,13 +326,7 @@ namespace BusinessValidation
                 throw new ValidationFailureException(ValidationFailures);
         }
 
-        private string ShowCounts
-        {
-            get
-            {
-                return $"Failure Count ➡️ {Results.FailCount}, Message Count ➡️ {Results.MessageCount}";
-            }
-        }
+        private string ShowCounts => $"Failure Count ➡️ {Results.FailCount}, Message Count ➡️ {Results.MessageCount}";
 
         private static string ExtractPath<T,TM>(Expression<Func<T, TM>> expression, PropertyDepth propertyDepth) => propertyDepth switch
         {

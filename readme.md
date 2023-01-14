@@ -21,7 +21,7 @@ if(validator) {
         validator.Validate(l => l.DateOfBirth, $"No valid date of birth is stored for the licensee with licence number {licenceNr}", licensee, l => l.DateOfBirth > DateTime.MinValue);
     }    
 }    
-validator.Throw(); // throws exception, only if IsValid() is false, which wraps the Validation Failures dictionary.
+validator.ThrowIfInvalid(); // throws exception, only if IsValid() is false, which wraps the Validation Failures dictionary.
 return validator; // returns object which implicitly casts to "true" if valid. 
 ```
 More example code can be found in the **sample** project in the repo code.
