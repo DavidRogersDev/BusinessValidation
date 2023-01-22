@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace BusinessValidation
 {
-    public class ValidationFailureException : Exception
+    public sealed class ValidationFailureException : Exception
     {
         public readonly IReadOnlyDictionary<string, IReadOnlyList<string>> Failures;
 

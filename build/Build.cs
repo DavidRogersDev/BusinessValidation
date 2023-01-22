@@ -1,3 +1,4 @@
+using Invariants;
 using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
 using Nuke.Common.IO;
@@ -21,7 +22,11 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main() => Execute<Build>(x => x.Pack);
+    public static int Main() => Execute<Build>(x => x.Push);
+
+    const string BinPattern = "**/bin";
+    const string ObjPattern = "**/obj";
+
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -33,27 +38,43 @@ class Build : NukeBuild
     [Parameter]
     readonly bool IgnoreFailedSources;
 
+    [Parameter]
+    readonly string ReleaseNotes;
+
     [GitVersion(NoFetch = true)]
     readonly GitVersion GitVersion;
 
+    [Parameter] 
+    string NugetApiUrl = "https://nuget.pkg.github.com/DavidRogersDev/index.json"; // default
+    
+    [Parameter] 
+    readonly string NugetApiKey;
+
     static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
-    static AbsolutePath MainSourceDirectory => RootDirectory / "src" / "BusinessValidation";
-    static AbsolutePath MainLibraryDirectory => MainSourceDirectory / "BusinessValidation";
-    static AbsolutePath TestsDirectory => MainSourceDirectory / "BusinessValidation.Tests";
+    static AbsolutePath SourceDirectory => RootDirectory / "src" / ProjectValues.BusinessValidationProject;
+    static AbsolutePath MainLibraryDirectory => SourceDirectory / ProjectValues.BusinessValidationProject;
+    static AbsolutePath TestsDirectory => SourceDirectory / "BusinessValidation.Tests";
+
 
     Target Print => _ => _
+    .Description("Displays certain variables of interest to the console.")
+    //.DependentFor(Clean)
     .Executes(() =>
     {
-        Log.Information("GitVersion = {Value}", GitVersion.MajorMinorPatch);
-        Log.Information("NuGetVersion = {Value}", GitVersion.NuGetVersion);
+        Log.Information("Release Notes = {Value}", ReleaseNotes);
+        Log.Information("Root Directory = {Value}", RootDirectory);
+        Log.Information("Configuration = {Value}", Configuration.Debug);
+        Log.Information("Major Minor Patch = {Value}", GitVersion.MajorMinorPatch);
+        Log.Information("NuGet Version = {Value}", GitVersion.NuGetVersion);
     });
 
     Target Clean => _ => _
+        .Unlisted()
         .Description("Cleaning Project.")
         .Executes(() =>
         {
-            MainLibraryDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
-            TestsDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            MainLibraryDirectory.GlobDirectories(BinPattern, ObjPattern).ForEach(DeleteDirectory);
+            TestsDirectory.GlobDirectories(BinPattern, ObjPattern).ForEach(DeleteDirectory);
             EnsureCleanDirectory(ArtifactsDirectory);
         });
 
@@ -62,6 +83,7 @@ class Build : NukeBuild
     .DependsOn(Clean)
     .Executes(() =>
         {
+            Log.Information("IgnoreFailedSources: {IgnoreFailedSources}", IgnoreFailedSources);
             DotNetRestore(_ => _
             .SetProjectFile(Solution)
             .SetIgnoreFailedSources(IgnoreFailedSources)
@@ -80,7 +102,7 @@ class Build : NukeBuild
             DotNetPublish(_ =>
                 _.SetProject(Solution)
                 .SetConfiguration(Configuration)
-                .SetCopyright($"David Rogers 2022 - {DateTime.Now.Year}")
+                .SetCopyright(PackageValues.Copyright)
                 .SetAssemblyVersion(GitVersion.AssemblySemFileVer)
                 .SetFileVersion(GitVersion.MajorMinorPatch)
                 .SetVersion(GitVersion.NuGetVersion)
@@ -99,24 +121,44 @@ class Build : NukeBuild
             .EnableNoBuild()
             .EnableNoRestore()
             .SetNoDependencies(true)
-            .SetPackageId("BusinessValidation")
-            .SetTitle("BusinessValidation")      
+            .SetPackageId(ProjectValues.BusinessValidationProject)
+            .SetTitle(ProjectValues.BusinessValidationProject)      
             .SetVersion(GitVersion.NuGetVersion)
             .SetRepositoryType(AzurePipelinesRepositoryType.Git.ToString().ToLowerInvariant())
-            .SetRepositoryUrl("https://github.com/DavidRogersDev/BusinessValidation.git")
-            .SetPackageReleaseNotes("Awesome")
-            .SetAuthors("David Rogers")
-            .SetPackageIconUrl("icon.png")
-            .SetProperty("PackageLicenseExpression", "MIT")
-            .SetPackageTags("BusinessValidation Validation Validator Validators")      
-            .SetPackageRequireLicenseAcceptance(false)
-            .SetDescription("A library to perform validation in business services and give a mechanism to report failures back to the user interface.")
-            .SetProperty("PackageReadmeFile", "readme.md")
-            .SetProperty("RepositoryBranch", GitVersion.BranchName)
-            .SetProperty("RepositoryCommit", GitVersion.Sha)
-            .SetProperty("Copyright", $"David Rogers 2022 - {DateTime.Now.Year}")
-            .SetProperty("PackageProjectUrl", "https://github.com/DavidRogersDev/BusinessValidation")
-            .SetProperty("PackageIcon", "icon.png")
+            .SetPackageReleaseNotes(ReleaseNotes)
+            .SetPackageProjectUrl(PackageValues.ProjectUrl)
+            .SetAuthors(PackageValues.Author)
+            .SetProperty(PackageProperties.PackageLicenseExpression, PackageValues.MITLicence)
+            .SetPackageTags(PackageValues.Tags)      
+            .SetPackageRequireLicenseAcceptance(false)      
+            .SetDescription(PackageValues.Description)
+            .SetRepositoryUrl(PackageValues.RepositoryUrl)
+            .SetProperty(PackageProperties.RepositoryBranch, GitVersion.BranchName)
+            .SetProperty(PackageProperties.RepositoryCommit, GitVersion.Sha)
+            .SetProperty(PackageProperties.Copyright, PackageValues.Copyright)
+            .SetProperty(PackageProperties.PackageReadmeFile, PackageValues.Readme)            
+            .SetProperty(PackageProperties.PackageIcon, PackageValues.Icon)
             .SetOutputDirectory(ArtifactsDirectory)
         ));
+
+    Target Push => _ => _
+        .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
+        .Requires(() => NugetApiKey)
+        .Requires(() => NugetApiUrl)
+        .Requires(() => Configuration.Equals(Configuration.Release))
+        .DependsOn(Pack)
+        .Executes(() => {
+
+            GlobFiles(ArtifactsDirectory, "*.nupkg")
+                .NotEmpty()
+                .Where(x => !x.EndsWith("symbols.nupkg"))
+                .ForEach(x =>
+                {
+                    DotNetNuGetPush(s => s
+                        .SetTargetPath(x)
+                        .SetSource(NugetApiUrl)
+                        .SetApiKey(NugetApiKey)
+                    );
+                });
+        });
 }

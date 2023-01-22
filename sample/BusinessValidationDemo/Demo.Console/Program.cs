@@ -45,6 +45,7 @@ var externalValidation = new Validator();
 externalValidation.AddFailure("ExternalError", "Some external validation failure happened");
 
 var failures = externalValidation.ValidationFailures;
+
 foreach (var failure in failures)
 {
     Console.Write($"{failure.Key}: ");
