@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - InvestigateNukeAsBuildTool
+      - publish/**
   pull_request:
     branches:
       - main
@@ -30,5 +30,6 @@ jobs:
           NugetApiKey: ${{ secrets.NUGET_API_KEY }}
           NugetApiUrl: 'https://nuget.pkg.github.com/DavidRogersDev/index.json'
           ReleaseNotes: ${{ secrets.RELEASE_NOTES }}
+          Configuration: 'Release'
         run: |
           ./build.sh
