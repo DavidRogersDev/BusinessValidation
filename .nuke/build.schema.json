@@ -90,7 +90,8 @@
               "Pack",
               "Print",
               "Push",
-              "Restore"
+              "Restore",
+              "Test"
             ]
           }
         },
@@ -109,7 +110,8 @@
               "Pack",
               "Print",
               "Push",
-              "Restore"
+              "Restore",
+              "Test"
             ]
           }
         },

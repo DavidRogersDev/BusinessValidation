@@ -45,9 +45,9 @@ class Build : NukeBuild
     [GitVersion(NoFetch = false)]
     readonly GitVersion GitVersion;
 
-    [Parameter] 
+    [Parameter]
     readonly string NugetApiUrl;
-    
+
     [Parameter]
     [Secret]
     readonly string NugetApiKey;
@@ -98,10 +98,10 @@ class Build : NukeBuild
         .Executes(() =>
         {
             var publishConfiguration =
-                from project in new[] { Solution.BusinessValidation }
+                from project in new[] { Solution.BusinessValidation, Solution.BusinessValidation_Tests }
                 from framework in project.GetTargetFrameworks()
                 select (project, framework);
-            
+
             DotNetPublish(_ =>
                 _.SetProject(Solution)
                 .SetConfiguration(Configuration)
@@ -116,9 +116,21 @@ class Build : NukeBuild
                 );
         });
 
+    Target Test => _ => _
+    .Description("Executes tests.")
+    .DependsOn(Compile)
+    .Executes(() =>
+    {
+        DotNetTest(_ => _
+        .SetProjectFile(Solution.BusinessValidation_Tests)
+        .SetConfiguration(Configuration)
+        .EnableNoBuild()
+        );
+    });
+
     Target Pack => _ => _
     .Description("Packs the project into a Nuget package.")
-    .DependsOn(Compile)
+    .DependsOn(Test)
     .Executes(() => DotNetPack(s => s
             .SetProject(Solution.BusinessValidation)
             .SetConfiguration(Configuration)
@@ -126,32 +138,34 @@ class Build : NukeBuild
             .EnableNoRestore()
             .SetNoDependencies(true)
             .SetPackageId(ProjectValues.BusinessValidationProject)
-            .SetTitle(ProjectValues.BusinessValidationProject)      
+            .SetTitle(ProjectValues.BusinessValidationProject)
             .SetVersion(GitVersion.NuGetVersion)
             .SetRepositoryType(AzurePipelinesRepositoryType.Git.ToString().ToLowerInvariant())
             .SetPackageReleaseNotes(ReleaseNotes)
             .SetPackageProjectUrl(PackageValues.ProjectUrl)
             .SetAuthors(PackageValues.Author)
             .SetProperty(PackageProperties.PackageLicenseExpression, PackageValues.MITLicence)
-            .SetPackageTags(PackageValues.Tags)      
-            .SetPackageRequireLicenseAcceptance(false)      
+            .SetPackageTags(PackageValues.Tags)
+            .SetPackageRequireLicenseAcceptance(false)
             .SetDescription(PackageValues.Description)
             .SetRepositoryUrl(PackageValues.RepositoryUrl)
             .SetProperty(PackageProperties.RepositoryBranch, GitVersion.BranchName)
             .SetProperty(PackageProperties.RepositoryCommit, GitVersion.Sha)
             .SetProperty(PackageProperties.Copyright, PackageValues.Copyright)
-            .SetProperty(PackageProperties.PackageReadmeFile, PackageValues.Readme)            
+            .SetProperty(PackageProperties.PackageReadmeFile, PackageValues.Readme)
             .SetProperty(PackageProperties.PackageIcon, PackageValues.Icon)
             .SetOutputDirectory(ArtifactsDirectory)
         ));
 
     Target Push => _ => _
+        .Description("Pushes the packages to the package registry.")
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
         .Requires(() => NugetApiKey)
         .Requires(() => NugetApiUrl)
         .Requires(() => Configuration.Equals(Configuration.Release))
         .DependsOn(Pack)
-        .Executes(() => {
+        .Executes(() =>
+        {
 
             GlobFiles(ArtifactsDirectory, "*.nupkg")
                 .NotEmpty()
