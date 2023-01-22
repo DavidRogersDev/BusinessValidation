@@ -30,7 +30,7 @@ namespace Demo.Console.Services
             Trace.WriteLine(enrollmentIssues[0]);
             Trace.WriteLine(enrollmentIssues[1]);
 
-            isValid.Throw();
+            isValid.ThrowIfInvalid();
 
             //  continue enrollment opeeration ...
 

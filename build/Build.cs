@@ -1,6 +1,7 @@
 using Invariants;
 using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
@@ -45,9 +46,10 @@ class Build : NukeBuild
     readonly GitVersion GitVersion;
 
     [Parameter] 
-    string NugetApiUrl = "https://nuget.pkg.github.com/DavidRogersDev/index.json"; // default
+    readonly string NugetApiUrl;
     
-    [Parameter] 
+    [Parameter]
+    [Secret]
     readonly string NugetApiKey;
 
     static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
@@ -70,7 +72,7 @@ class Build : NukeBuild
 
     Target Clean => _ => _
         .Unlisted()
-        .Description("Cleaning Project.")
+        .Description("Cleans the project.")
         .Executes(() =>
         {
             MainLibraryDirectory.GlobDirectories(BinPattern, ObjPattern).ForEach(DeleteDirectory);
@@ -91,6 +93,7 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
+        .Description("Compiles the project.")
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -114,8 +117,9 @@ class Build : NukeBuild
         });
 
     Target Pack => _ => _
-      .DependsOn(Compile)
-      .Executes(() => DotNetPack(s => s
+    .Description("Packs the project into a Nuget package.")
+    .DependsOn(Compile)
+    .Executes(() => DotNetPack(s => s
             .SetProject(Solution.BusinessValidation)
             .SetConfiguration(Configuration)
             .EnableNoBuild()

@@ -19,7 +19,7 @@ namespace Demo.Console.Services
             validator.Validate(l => l.CurrentlyRostered, $"{lecturer.FirstName} {lecturer.LastName} is not currently available.", lecturer, l => l.CurrentlyRostered);
             validator.Validate(l => l.Address.PostCode, $"{lecturer.Address.PostCode} is not a close enough postcode for consultations.", lecturer, l => l.Address.PostCode > 1999 & l.Address.PostCode < 3000);
 
-            validator.Throw();
+            validator.ThrowIfInvalid();
 
             return lecturer; 
         }
