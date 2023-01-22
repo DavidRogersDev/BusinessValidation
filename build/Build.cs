@@ -42,7 +42,7 @@ class Build : NukeBuild
     [Parameter]
     readonly string ReleaseNotes;
 
-    [GitVersion(NoFetch = true)]
+    [GitVersion]
     readonly GitVersion GitVersion;
 
     [Parameter] 
