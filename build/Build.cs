@@ -59,7 +59,7 @@ class Build : NukeBuild
 
 
     Target Print => _ => _
-    .Description("Displays certain variables of interest to the console.")
+    .Description(Descriptions.Print)
     //.DependentFor(Clean)
     .Executes(() =>
     {
@@ -72,7 +72,7 @@ class Build : NukeBuild
 
     Target Clean => _ => _
         .Unlisted()
-        .Description("Cleans the project.")
+        .Description(Descriptions.Clean)
         .Executes(() =>
         {
             MainLibraryDirectory.GlobDirectories(BinPattern, ObjPattern).ForEach(DeleteDirectory);
@@ -81,11 +81,11 @@ class Build : NukeBuild
         });
 
     Target Restore => _ => _
-    .Description("Restoring Project Dependencies.")
+    .Description(Descriptions.Restore)
     .DependsOn(Clean)
     .Executes(() =>
         {
-            Log.Information("IgnoreFailedSources: {IgnoreFailedSources}", IgnoreFailedSources);
+            //Log.Information("IgnoreFailedSources: {IgnoreFailedSources}", IgnoreFailedSources);
             DotNetRestore(_ => _
             .SetProjectFile(Solution)
             .SetIgnoreFailedSources(IgnoreFailedSources)
@@ -93,7 +93,7 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
-        .Description("Compiles the project.")
+        .Description(Descriptions.Compile)
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -117,7 +117,7 @@ class Build : NukeBuild
         });
 
     Target Test => _ => _
-    .Description("Executes tests.")
+    .Description(Descriptions.Test)
     .DependsOn(Compile)
     .Executes(() =>
     {
@@ -129,7 +129,7 @@ class Build : NukeBuild
     });
 
     Target Pack => _ => _
-    .Description("Packs the project into a Nuget package.")
+    .Description(Descriptions.Pack)
     .DependsOn(Test)
     .Executes(() => DotNetPack(s => s
             .SetProject(Solution.BusinessValidation)
@@ -158,7 +158,7 @@ class Build : NukeBuild
         ));
 
     Target Push => _ => _
-        .Description("Pushes the packages to the package registry.")
+        .Description(Descriptions.Push)
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
         .Requires(() => NugetApiKey)
         .Requires(() => NugetApiUrl)
