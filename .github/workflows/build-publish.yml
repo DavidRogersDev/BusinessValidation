@@ -28,8 +28,8 @@ jobs:
         shell: bash
         env:
           NugetApiKey: ${{ secrets.NUGET_API_KEY }}
-          NugetApiUrl: 'https://nuget.pkg.github.com/DavidRogersDev/index.json'
+          NugetApiUrl: ${{ vars.PACKAGES_NUGET_URL }}
           ReleaseNotes: ${{ secrets.RELEASE_NOTES }}
-          Configuration: 'Release'
+          Configuration: ${{ vars.Configuration }}
         run: |
           ./build.sh
