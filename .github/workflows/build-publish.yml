@@ -31,7 +31,7 @@ jobs:
           NugetApiUrl: ${{ vars.PACKAGES_NUGET_URL }}
           NugetOrgApiKey: ${{ secrets.NUGETORG_API_KEY }}
           NugetOrgApiUrl: ${{ vars.NUGETORG_NUGET_URL }}
-          ReleaseNotes: ${{ secrets.RELEASE_NOTES }}
+          ReleaseNotes: ${{ vars.RELEASE_NOTES }}
           Configuration: ${{ vars.Configuration }}
         run: |
           ./build.sh

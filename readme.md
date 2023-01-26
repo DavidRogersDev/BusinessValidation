@@ -14,7 +14,7 @@ if(validator) {
     var licensee = GetLicensee(licenceNr);
 
     if(licensee is null) {
-        // Can't pass a null value to the validator, but can add a raw message to the relevant Failure Bundle.
+        // add a raw message to the relevant Failure Bundle.
         validator.AddFailure("Licensee", $"No licensee exists with the licence number {licenceNr}.");
     } else {
         // validate an object
