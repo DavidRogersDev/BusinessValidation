@@ -52,6 +52,13 @@ class Build : NukeBuild
     [Secret]
     readonly string NugetApiKey;
 
+    [Parameter]
+    readonly string NugetOrgApiUrl;
+
+    [Parameter]
+    [Secret]
+    readonly string NugetOrgApiKey;
+
     static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
     static AbsolutePath SourceDirectory => RootDirectory / "src" / ProjectValues.BusinessValidationProject;
     static AbsolutePath MainLibraryDirectory => SourceDirectory / ProjectValues.BusinessValidationProject;
@@ -60,14 +67,14 @@ class Build : NukeBuild
 
     Target Print => _ => _
     .Description(Descriptions.Print)
-    //.DependentFor(Clean)
+    .DependentFor(Clean)
     .Executes(() =>
     {
         Log.Information("Release Notes = {Value}", ReleaseNotes);
-        Log.Information("Root Directory = {Value}", RootDirectory);
-        Log.Information("Configuration = {Value}", Configuration.Debug);
+        Log.Information("Root Directory = {Value}", RootDirectory);        
         Log.Information("Major Minor Patch = {Value}", GitVersion.MajorMinorPatch);
         Log.Information("NuGet Version = {Value}", GitVersion.NuGetVersion);
+        Log.Information("PreReleaseLabel = {Value}", GitVersion?.PreReleaseLabel ?? "????");
     });
 
     Target Clean => _ => _
@@ -166,10 +173,28 @@ class Build : NukeBuild
         .DependsOn(Pack)
         .Executes(() =>
         {
+            var nugetFiles = GlobFiles(ArtifactsDirectory, "*.nupkg");
 
-            GlobFiles(ArtifactsDirectory, "*.nupkg")
-                .NotEmpty()
-                .Where(x => !x.EndsWith("symbols.nupkg"))
+            Assert.NotEmpty(nugetFiles, "There are no Nuget files");
+
+            var branchName = GitVersion.BranchName;            
+
+            // if we are on the main branch and it is not a pre-release, publish to Nuget.org
+            if(branchName.Equals("main", StringComparison.OrdinalIgnoreCase)
+                && string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
+            {
+                nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
+                    .ForEach(x =>
+                    {
+                        DotNetNuGetPush(s => s
+                            .SetTargetPath(x)
+                            .SetSource(NugetOrgApiUrl)
+                            .SetApiKey(NugetOrgApiKey)
+                        );
+                    });
+            }
+
+            nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
                 .ForEach(x =>
                 {
                     DotNetNuGetPush(s => s
