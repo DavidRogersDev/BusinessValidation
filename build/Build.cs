@@ -176,31 +176,32 @@ class Build : NukeBuild
         .DependsOn(Pack)
         .Executes(() =>
         {
-            var nugetFiles = GlobFiles(ArtifactsDirectory, "*.nupkg");
+        var nugetFiles = GlobFiles(ArtifactsDirectory, "*.nupkg");
 
-            Assert.NotEmpty(nugetFiles, "There are no Nuget files");
+        Assert.NotEmpty(nugetFiles, "There are no Nuget files");
 
-            var branchName = GitVersion.BranchName;
+        var branchName = GitVersion.BranchName;
 
-            // if we are on the main branch and it is not a pre-release, publish to Nuget.org
-            if (branchName.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        // if we are on the main branch and it is not a pre-release, publish to Nuget.org
+        if (branchName.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
             {
-                if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
-                {
-                    // this publishes to the nuget.org package manager
-                    nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
-                        .ForEach(x =>
-                        {
-                            DotNetNuGetPush(s => s
-                                .SetTargetPath(x)
-                                .SetSource(NugetOrgApiUrl)
-                                .SetApiKey(NugetOrgApiKey)
-                            );
-                        });
-                }
-
-                // this publishes to the github packages package manager
+                // this publishes to the nuget.org package manager
                 nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
+                    .ForEach(x =>
+                    {
+                        DotNetNuGetPush(s => s
+                            .SetTargetPath(x)
+                            .SetSource(NugetOrgApiUrl)
+                            .SetApiKey(NugetOrgApiKey)
+                        );
+                    });
+            }
+            else if (GitVersion.PreReleaseLabel.Equals("rc"))
+                {
+                    // this publishes to the github packages package manager
+                    nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
                     .ForEach(x =>
                     {
                         DotNetNuGetPush(s => s
@@ -209,6 +210,7 @@ class Build : NukeBuild
                             .SetApiKey(NugetApiKey)
                         );
                     });
+                }
             }
         });
 }
