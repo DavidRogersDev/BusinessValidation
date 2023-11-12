@@ -1,0 +1,12 @@
+mode: ContinuousDeployment
+continuous-delivery-fallback-tag: useBranchName
+branches:
+  main:
+    tag: ci
+    increment: Minor
+    prevent-increment-of-merged-branch-version: false
+    track-merge-target: true
+    tracks-release-branches: true
+  release:
+    tag: rc
+    increment: Patch

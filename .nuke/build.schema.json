@@ -57,6 +57,13 @@
         "NugetApiUrl": {
           "type": "string"
         },
+        "NugetOrgApiKey": {
+          "type": "string",
+          "default": "Secrets must be entered via 'nuke :secrets [profile]'"
+        },
+        "NugetOrgApiUrl": {
+          "type": "string"
+        },
         "Partition": {
           "type": "string",
           "description": "Partition to use on CI"
