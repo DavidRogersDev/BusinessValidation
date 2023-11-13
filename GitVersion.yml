@@ -11,8 +11,7 @@ branches:
     pre-release-weight: 55000
   release:
     tag: rc
-    increment: Patch
-    is-release-branch: true
+    increment: Patch    
     is-release-branch: true
     is-mainline: false
     pre-release-weight: 30000
