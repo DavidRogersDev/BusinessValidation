@@ -134,7 +134,6 @@ class Build : NukeBuild
         .EnableNoBuild()
         .SetProjectFile(Solution.BusinessValidation_Tests)
         .SetConfiguration(Configuration)
-        .EnableNoBuild()
         );
     });
 
