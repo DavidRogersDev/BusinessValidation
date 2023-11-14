@@ -71,7 +71,7 @@ class Build : NukeBuild
     .Executes(() =>
     {
         Log.Information("Release Notes = {Value}", ReleaseNotes);
-        Log.Information("Root Directory = {Value}", RootDirectory);        
+        Log.Information("Root Directory = {Value}", RootDirectory);
         Log.Information("Major Minor Patch = {Value}", GitVersion.MajorMinorPatch);
         Log.Information("NuGet Version = {Value}", GitVersion.NuGetVersion);
         Log.Information("PreReleaseLabel = {Value}", GitVersion?.PreReleaseLabel ?? "????");
@@ -111,6 +111,7 @@ class Build : NukeBuild
 
             DotNetPublish(_ =>
                 _.SetProject(Solution)
+                .EnableNoRestore()
                 .SetConfiguration(Configuration)
                 .SetCopyright(PackageValues.Copyright)
                 .SetAssemblyVersion(GitVersion.AssemblySemFileVer)
@@ -129,9 +130,10 @@ class Build : NukeBuild
     .Executes(() =>
     {
         DotNetTest(_ => _
+        .EnableNoRestore()
+        .EnableNoBuild()
         .SetProjectFile(Solution.BusinessValidation_Tests)
         .SetConfiguration(Configuration)
-        .EnableNoBuild()
         );
     });
 
@@ -173,16 +175,18 @@ class Build : NukeBuild
         .DependsOn(Pack)
         .Executes(() =>
         {
-            var nugetFiles = GlobFiles(ArtifactsDirectory, "*.nupkg");
+        var nugetFiles = GlobFiles(ArtifactsDirectory, "*.nupkg");
 
-            Assert.NotEmpty(nugetFiles, "There are no Nuget files");
+        Assert.NotEmpty(nugetFiles, "There are no Nuget files");
 
-            var branchName = GitVersion.BranchName;            
+        var branchName = GitVersion.BranchName;
 
-            // if we are on the main branch and it is not a pre-release, publish to Nuget.org
-            if(branchName.Equals("main", StringComparison.OrdinalIgnoreCase)
-                && string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
+        // if we are on the main branch and it is not a pre-release, publish to Nuget.org
+        if (branchName.StartsWith("release", StringComparison.OrdinalIgnoreCase))
+        {
+            if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
             {
+                // this publishes to the nuget.org package manager
                 nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
                     .ForEach(x =>
                     {
@@ -193,15 +197,19 @@ class Build : NukeBuild
                         );
                     });
             }
-
-            nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
-                .ForEach(x =>
+            else if (GitVersion.PreReleaseLabel.Equals("rc"))
                 {
-                    DotNetNuGetPush(s => s
-                        .SetTargetPath(x)
-                        .SetSource(NugetApiUrl)
-                        .SetApiKey(NugetApiKey)
-                    );
-                });
+                    // this publishes to the github packages package manager
+                    nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
+                    .ForEach(x =>
+                    {
+                        DotNetNuGetPush(s => s
+                            .SetTargetPath(x)
+                            .SetSource(NugetApiUrl)
+                            .SetApiKey(NugetApiKey)
+                        );
+                    });
+                }
+            }
         });
 }

@@ -27,3 +27,9 @@ return validator; // returns object which implicitly casts to "true" if valid.
 More example code can be found in the **sample** project in the repo code.
 ## Read About it
 I wrote an article explaining the genesis and usage of Business Validation [here](https://medium.com/p/ef161bf5e3b9).
+
+## Build It
+You can easily build the assembly by cloning the repository, changing to the root directory in a shell and running the following command:    
+`nuke Compile`  
+If you also want to run the unit tests:  
+`nuke Test`  
