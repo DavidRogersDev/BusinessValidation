@@ -5,6 +5,9 @@ on:
       - main
       - release/**
       - develop/**
+    paths-ignore:
+      - 'readme.md'
+      - 'LICENCE'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,6 +33,5 @@ jobs:
           NugetOrgApiKey: ${{ secrets.NUGETORG_API_KEY }}
           NugetOrgApiUrl: ${{ vars.NUGETORG_NUGET_URL }}
           ReleaseNotes: ${{ vars.RELEASE_NOTES }}
-          Configuration: ${{ vars.Configuration }}
         run: |
           ./build.sh
