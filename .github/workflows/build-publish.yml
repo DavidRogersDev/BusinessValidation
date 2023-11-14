@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dotnet-version: ['7.0.x']
+        dotnet-version: ['8.0.x']
     steps:
       - name: Setup .NET ${{ matrix.dotnet-version }}
         uses: actions/setup-dotnet@v3
@@ -28,10 +28,10 @@ jobs:
       - name: Run nuke
         shell: bash
         env:
-          NugetApiKey: ${{ secrets.NUGET_API_KEY }}
-          NugetApiUrl: ${{ vars.PACKAGES_NUGET_URL }}
-          NugetOrgApiKey: ${{ secrets.NUGETORG_API_KEY }}
-          NugetOrgApiUrl: ${{ vars.NUGETORG_NUGET_URL }}
+          PackagesNugetApiKey: ${{ secrets.NUGET_API_KEY }}
+          PackagesNugetApiUrl: ${{ vars.PACKAGES_NUGET_URL }}
+          NugetOrgNugetApiKey: ${{ secrets.NUGETORG_API_KEY }}
+          NugetOrgNugetApiUrl: ${{ vars.NUGETORG_NUGET_URL }}
           ReleaseNotes: ${{ vars.RELEASE_NOTES }}
         run: |
           ./build.sh
