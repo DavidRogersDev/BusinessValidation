@@ -28,6 +28,7 @@ class Build : NukeBuild
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    bool IsPublishableBranch = false;
 
 
     [Solution(GenerateProjects = true)]
@@ -57,14 +58,9 @@ class Build : NukeBuild
     readonly string NugetOrgNugetApiKey;
 
     static AbsolutePath ArtifactsDirectory => RootDirectory / ProjectValues.ArtifactsDirectory;
-    static AbsolutePath SourceDirectory => RootDirectory / ProjectValues.SrcDirectory / ProjectValues.BusinessValidationProject;
-    static AbsolutePath MainLibraryDirectory => SourceDirectory / ProjectValues.BusinessValidationProject;
-    static AbsolutePath TestsDirectory => SourceDirectory / ProjectValues.BusinessValidationTestsProject;
-
 
     Target Print => _ => _
     .Description(Descriptions.Print)
-    .DependentFor(Clean)
     .Executes(() =>
     {
         Log.Information("Release Notes = {Value}", ReleaseNotes);
@@ -73,16 +69,20 @@ class Build : NukeBuild
         Log.Information("NuGet Version = {Value}", GitVersion.NuGetVersion);
         Log.Information("PreReleaseLabel = {Value}", GitVersion?.PreReleaseLabel ?? "????");
         Log.Information("Configuration = {Value}", Configuration?.ToString() ?? "????");
+
+        IsPublishableBranch = GitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase);
     });
 
     Target Clean => _ => _
-        .Unlisted()
         .Description(Descriptions.Clean)
+        .DependsOn(Print)
         .Executes(() =>
         {
             Log.Information("Cleaning binary directories");
-            MainLibraryDirectory.GlobDirectories(BinPattern, ObjPattern).DeleteDirectories();
-            TestsDirectory.GlobDirectories(BinPattern, ObjPattern).DeleteDirectories();
+
+            Solution.BusinessValidation.Directory.GlobDirectories(BinPattern, ObjPattern).DeleteDirectories();
+            Solution.BusinessValidation_Tests.Directory.GlobDirectories(BinPattern, ObjPattern).DeleteDirectories();
+
             ArtifactsDirectory.CreateOrCleanDirectory();
         });
 
@@ -117,7 +117,7 @@ class Build : NukeBuild
                 .SetFileVersion(GitVersion.MajorMinorPatch)
                 .SetVersion(GitVersion.NuGetVersion)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
-                .AddNoWarns(new[] { 8603 } )
+                .AddNoWarns(new[] { 8603 })
                 .CombineWith(publishConfiguration, (_, v) =>
                     _.SetProject(v.project)
                     .SetFramework(v.framework))
@@ -169,8 +169,11 @@ class Build : NukeBuild
     Target Push => _ => _
         .Description(Descriptions.Push)
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
+        .OnlyWhenDynamic(() => IsPublishableBranch) // checked during run. This variable is set in the Print task.
         .Requires(() => NugetOrgNugetApiKey)
         .Requires(() => NugetOrgNugetApiUrl)
+        .Requires(() => PackagesNugetApiKey)
+        .Requires(() => PackagesNugetApiUrl)
         .Requires(() => Configuration.Equals(Configuration.Release))
         .DependsOn(Pack)
         .Executes(() =>
@@ -179,38 +182,33 @@ class Build : NukeBuild
 
             Assert.NotEmpty(nugetFiles, "There are no Nuget files");
 
-            var branchName = GitVersion.BranchName;
-
-            // if we are on the main branch and it is not a pre-release, publish to Nuget.org
-            if (branchName.StartsWith(ProjectValues.ReleaseConfig, StringComparison.OrdinalIgnoreCase))
+            // if it is not a pre-release, publish to Nuget.org
+            if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
             {
-                if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
-                {
-                    // this publishes to the nuget.org package manager
-                    nugetFiles.Where(filePath => !filePath.Name.EndsWith(ProjectValues.NugetSymbolsPackages))
-                        .ForEach(x =>
-                        {
-                            DotNetNuGetPush(s => s
-                                .SetTargetPath(x)
-                                .SetSource(NugetOrgNugetApiUrl)
-                                .SetApiKey(NugetOrgNugetApiKey)
-                            );
-                        });
-                }
-                else if (GitVersion.PreReleaseLabel.Equals(ProjectValues.CiBuild, StringComparison.Ordinal) || 
-                    GitVersion.PreReleaseLabel.Equals(ProjectValues.RcBuild, StringComparison.Ordinal))
-                {
-                    // this publishes to the github packages package manager
-                    nugetFiles.Where(filePath => !filePath.Name.EndsWith(ProjectValues.NugetSymbolsPackages))
-                        .ForEach(x =>
+                // this publishes to the nuget.org package manager
+                nugetFiles.Where(filePath => !filePath.Name.EndsWith(ProjectValues.NugetSymbolsPackages, StringComparison.OrdinalIgnoreCase))
+                    .ForEach(x =>
                     {
                         DotNetNuGetPush(s => s
                             .SetTargetPath(x)
-                            .SetSource(PackagesNugetApiUrl)
-                            .SetApiKey(PackagesNugetApiKey)
+                            .SetSource(NugetOrgNugetApiUrl)
+                            .SetApiKey(NugetOrgNugetApiKey)
                         );
                     });
-                }
+            }
+            else if (GitVersion.PreReleaseLabel.Equals(ProjectValues.CiBuild, StringComparison.OrdinalIgnoreCase) ||
+                GitVersion.PreReleaseLabel.Equals(ProjectValues.RcBuild, StringComparison.OrdinalIgnoreCase))
+            {
+                // this publishes to the github packages package manager
+                nugetFiles.Where(filePath => !filePath.Name.EndsWith(ProjectValues.NugetSymbolsPackages))
+                    .ForEach(x =>
+                {
+                    DotNetNuGetPush(s => s
+                        .SetTargetPath(x)
+                        .SetSource(PackagesNugetApiUrl)
+                        .SetApiKey(PackagesNugetApiKey)
+                    );
+                });
             }
         });
 }

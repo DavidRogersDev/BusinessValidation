@@ -6,7 +6,7 @@ on:
       - release/**
       - develop/**
     paths-ignore:
-      - 'readme.md'
+      - '**/*.md'
       - 'LICENCE'
 jobs:
   build:
