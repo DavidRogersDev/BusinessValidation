@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace Invariants
+﻿namespace Invariants
 {
     public sealed class PackageProperties
     {

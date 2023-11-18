@@ -6,6 +6,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.Octopus;
 using Nuke.Common.Utilities.Collections;
 using Serilog;
 using System;
@@ -22,13 +23,10 @@ class Build : NukeBuild
 
     public static int Main() => Execute<Build>(x => x.Push);
 
-    const string BinPattern = "**/bin";
-    const string ObjPattern = "**/obj";
-
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-    bool IsPublishableBranch = false;
+    static bool IsPublishableBranch = false;
 
 
     [Solution(GenerateProjects = true)]
@@ -57,18 +55,18 @@ class Build : NukeBuild
     [Secret]
     readonly string NugetOrgNugetApiKey;
 
-    static AbsolutePath ArtifactsDirectory => RootDirectory / ProjectValues.ArtifactsDirectory;
+    static AbsolutePath ArtifactsDirectory => RootDirectory / FileSystem.ArtifactsDirectory;
 
     Target Print => _ => _
     .Description(Descriptions.Print)
     .Executes(() =>
     {
-        Log.Information("Release Notes = {Value}", ReleaseNotes);
-        Log.Information("Root Directory = {Value}", RootDirectory);
-        Log.Information("Major Minor Patch = {Value}", GitVersion.MajorMinorPatch);
-        Log.Information("NuGet Version = {Value}", GitVersion.NuGetVersion);
-        Log.Information("PreReleaseLabel = {Value}", GitVersion?.PreReleaseLabel ?? "????");
-        Log.Information("Configuration = {Value}", Configuration?.ToString() ?? "????");
+        Log.Information(LogMessage.ReleaseNotes, ReleaseNotes ?? ProjectValues.NoValue);
+        Log.Information(LogMessage.RootDirectory, RootDirectory.Name);
+        Log.Information(LogMessage.MajorMinorPatch, GitVersion.MajorMinorPatch);
+        Log.Information(LogMessage.NugetVersion, GitVersion.NuGetVersion);
+        Log.Information(LogMessage.PreReleaseLabel, GitVersion?.PreReleaseLabel ?? ProjectValues.NoValue);
+        Log.Information(LogMessage.Configuration, Configuration?.ToString() ?? ProjectValues.NoValue);
 
         IsPublishableBranch = GitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase);
     });
@@ -78,10 +76,10 @@ class Build : NukeBuild
         .DependsOn(Print)
         .Executes(() =>
         {
-            Log.Information("Cleaning binary directories");
+            Log.Information(LogMessage.CleaningBinaryDirectories);
 
-            Solution.BusinessValidation.Directory.GlobDirectories(BinPattern, ObjPattern).DeleteDirectories();
-            Solution.BusinessValidation_Tests.Directory.GlobDirectories(BinPattern, ObjPattern).DeleteDirectories();
+            Solution.BusinessValidation.Directory.GlobDirectories(FileSystem.GlobPattern.BinPattern, FileSystem.GlobPattern.ObjPattern).DeleteDirectories();
+            Solution.BusinessValidation_Tests.Directory.GlobDirectories(FileSystem.GlobPattern.BinPattern, FileSystem.GlobPattern.ObjPattern).DeleteDirectories();
 
             ArtifactsDirectory.CreateOrCleanDirectory();
         });
@@ -117,7 +115,7 @@ class Build : NukeBuild
                 .SetFileVersion(GitVersion.MajorMinorPatch)
                 .SetVersion(GitVersion.NuGetVersion)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
-                .AddNoWarns(new[] { 8603 })
+                .AddNoWarns(NoWarn.Codes)
                 .CombineWith(publishConfiguration, (_, v) =>
                     _.SetProject(v.project)
                     .SetFramework(v.framework))
@@ -178,15 +176,15 @@ class Build : NukeBuild
         .DependsOn(Pack)
         .Executes(() =>
         {
-            var nugetFiles = ArtifactsDirectory.GlobFiles(ProjectValues.NugetPackages);
+            var nugetFiles = ArtifactsDirectory.GlobFiles(FileSystem.Nuget.Packages);
 
-            Assert.NotEmpty(nugetFiles, "There are no Nuget files");
+            Assert.NotEmpty(nugetFiles, LogMessage.NoNugetFiles);
 
             // if it is not a pre-release, publish to Nuget.org
             if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
             {
                 // this publishes to the nuget.org package manager
-                nugetFiles.Where(filePath => !filePath.Name.EndsWith(ProjectValues.NugetSymbolsPackages, StringComparison.OrdinalIgnoreCase))
+                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages, StringComparison.OrdinalIgnoreCase))
                     .ForEach(x =>
                     {
                         DotNetNuGetPush(s => s
@@ -196,11 +194,11 @@ class Build : NukeBuild
                         );
                     });
             }
-            else if (GitVersion.PreReleaseLabel.Equals(ProjectValues.CiBuild, StringComparison.OrdinalIgnoreCase) ||
-                GitVersion.PreReleaseLabel.Equals(ProjectValues.RcBuild, StringComparison.OrdinalIgnoreCase))
+            else if (GitVersion.PreReleaseLabel.Equals(BuildType.Ci, StringComparison.OrdinalIgnoreCase) ||
+                GitVersion.PreReleaseLabel.Equals(BuildType.Rc, StringComparison.OrdinalIgnoreCase))
             {
                 // this publishes to the github packages package manager
-                nugetFiles.Where(filePath => !filePath.Name.EndsWith(ProjectValues.NugetSymbolsPackages))
+                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages))
                     .ForEach(x =>
                 {
                     DotNetNuGetPush(s => s
