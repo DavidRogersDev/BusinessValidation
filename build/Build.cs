@@ -1,18 +1,16 @@
 using Invariants;
 using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
-using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.Octopus;
 using Nuke.Common.Utilities.Collections;
 using Serilog;
 using System;
 using System.Linq;
-using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 class Build : NukeBuild
@@ -23,14 +21,11 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main() => Execute<Build>(x => x.Push);
-
-    const string BinPattern = "**/bin";
-    const string ObjPattern = "**/obj";
-
+    public static int Main() => Execute<Build>(b => b.Push);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+    static bool IsPublishableBranch = false;
 
 
     [Solution(GenerateProjects = true)]
@@ -46,49 +41,50 @@ class Build : NukeBuild
     readonly GitVersion GitVersion;
 
     [Parameter]
-    readonly string NugetApiUrl;
+    readonly string PackagesNugetApiUrl;
 
     [Parameter]
     [Secret]
-    readonly string NugetApiKey;
+    readonly string PackagesNugetApiKey;
 
     [Parameter]
-    readonly string NugetOrgApiUrl;
+    readonly string NugetOrgNugetApiUrl;
 
     [Parameter]
     [Secret]
-    readonly string NugetOrgApiKey;
+    readonly string NugetOrgNugetApiKey;
 
-    static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
-    static AbsolutePath SourceDirectory => RootDirectory / "src" / ProjectValues.BusinessValidationProject;
-    static AbsolutePath MainLibraryDirectory => SourceDirectory / ProjectValues.BusinessValidationProject;
-    static AbsolutePath TestsDirectory => SourceDirectory / "BusinessValidation.Tests";
-
+    static AbsolutePath ArtifactsDirectory => RootDirectory / FileSystem.ArtifactsDirectory;
 
     Target Print => _ => _
-    .Description(Descriptions.Print)
-    .DependentFor(Clean)
+    .Description(Description.Print)
     .Executes(() =>
     {
-        Log.Information("Release Notes = {Value}", ReleaseNotes);
-        Log.Information("Root Directory = {Value}", RootDirectory);
-        Log.Information("Major Minor Patch = {Value}", GitVersion.MajorMinorPatch);
-        Log.Information("NuGet Version = {Value}", GitVersion.NuGetVersion);
-        Log.Information("PreReleaseLabel = {Value}", GitVersion?.PreReleaseLabel ?? "????");
+        Log.Information(LogMessage.ReleaseNotes, ReleaseNotes ?? ProjectValue.NoValue);
+        Log.Information(LogMessage.RootDirectory, RootDirectory.Name);
+        Log.Information(LogMessage.MajorMinorPatch, GitVersion.MajorMinorPatch);
+        Log.Information(LogMessage.NugetVersion, GitVersion.NuGetVersion);
+        Log.Information(LogMessage.PreReleaseLabel, GitVersion?.PreReleaseLabel ?? ProjectValue.NoValue);
+        Log.Information(LogMessage.Configuration, Configuration?.ToString() ?? ProjectValue.NoValue);
+
+        IsPublishableBranch = GitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase);
     });
 
     Target Clean => _ => _
-        .Unlisted()
-        .Description(Descriptions.Clean)
+        .Description(Description.Clean)
+        .DependsOn(Print)
         .Executes(() =>
         {
-            MainLibraryDirectory.GlobDirectories(BinPattern, ObjPattern).ForEach(DeleteDirectory);
-            TestsDirectory.GlobDirectories(BinPattern, ObjPattern).ForEach(DeleteDirectory);
-            EnsureCleanDirectory(ArtifactsDirectory);
+            Log.Information(LogMessage.CleaningBinaryDirectories);
+
+            Solution.BusinessValidation.Directory.GlobDirectories(FileSystem.GlobPattern.BinPattern, FileSystem.GlobPattern.ObjPattern).DeleteDirectories();
+            Solution.BusinessValidation_Tests.Directory.GlobDirectories(FileSystem.GlobPattern.BinPattern, FileSystem.GlobPattern.ObjPattern).DeleteDirectories();
+
+            ArtifactsDirectory.CreateOrCleanDirectory();
         });
 
     Target Restore => _ => _
-    .Description(Descriptions.Restore)
+    .Description(Description.Restore)
     .DependsOn(Clean)
     .Executes(() =>
         {
@@ -100,7 +96,7 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
-        .Description(Descriptions.Compile)
+        .Description(Description.Compile)
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -113,11 +109,12 @@ class Build : NukeBuild
                 _.SetProject(Solution)
                 .EnableNoRestore()
                 .SetConfiguration(Configuration)
-                .SetCopyright(PackageValues.Copyright)
+                .SetCopyright(PackageValue.Copyright)
                 .SetAssemblyVersion(GitVersion.AssemblySemFileVer)
                 .SetFileVersion(GitVersion.MajorMinorPatch)
                 .SetVersion(GitVersion.NuGetVersion)
                 .SetInformationalVersion(GitVersion.InformationalVersion)
+                .AddNoWarns(NoWarn.Codes)
                 .CombineWith(publishConfiguration, (_, v) =>
                     _.SetProject(v.project)
                     .SetFramework(v.framework))
@@ -125,7 +122,7 @@ class Build : NukeBuild
         });
 
     Target Test => _ => _
-    .Description(Descriptions.Test)
+    .Description(Description.Test)
     .DependsOn(Compile)
     .Executes(() =>
     {
@@ -138,7 +135,7 @@ class Build : NukeBuild
     });
 
     Target Pack => _ => _
-    .Description(Descriptions.Pack)
+    .Description(Description.Pack)
     .DependsOn(Test)
     .Executes(() => DotNetPack(s => s
             .SetProject(Solution.BusinessValidation)
@@ -146,70 +143,68 @@ class Build : NukeBuild
             .EnableNoBuild()
             .EnableNoRestore()
             .SetNoDependencies(true)
-            .SetPackageId(ProjectValues.BusinessValidationProject)
-            .SetTitle(ProjectValues.BusinessValidationProject)
+            .SetPackageId(Solution.BusinessValidation.Name)
+            .SetTitle(Solution.BusinessValidation.Name)
             .SetVersion(GitVersion.NuGetVersion)
             .SetRepositoryType(AzurePipelinesRepositoryType.Git.ToString().ToLowerInvariant())
             .SetPackageReleaseNotes(ReleaseNotes)
-            .SetPackageProjectUrl(PackageValues.ProjectUrl)
-            .SetAuthors(PackageValues.Author)
-            .SetProperty(PackageProperties.PackageLicenseExpression, PackageValues.MITLicence)
-            .SetPackageTags(PackageValues.Tags)
+            .SetPackageProjectUrl(PackageValue.ProjectUrl)
+            .SetAuthors(PackageValue.Author)
+            .SetProperty(PackageProperty.PackageLicenseExpression, PackageValue.MITLicence)
+            .SetPackageTags(PackageValue.Tags)
             .SetPackageRequireLicenseAcceptance(false)
-            .SetDescription(PackageValues.Description)
-            .SetRepositoryUrl(PackageValues.RepositoryUrl)
-            .SetProperty(PackageProperties.RepositoryBranch, GitVersion.BranchName)
-            .SetProperty(PackageProperties.RepositoryCommit, GitVersion.Sha)
-            .SetProperty(PackageProperties.Copyright, PackageValues.Copyright)
-            .SetProperty(PackageProperties.PackageReadmeFile, PackageValues.Readme)
-            .SetProperty(PackageProperties.PackageIcon, PackageValues.Icon)
+            .SetDescription(PackageValue.Description)
+            .SetRepositoryUrl(PackageValue.RepositoryUrl)
+            .SetProperty(PackageProperty.RepositoryBranch, GitVersion.BranchName)
+            .SetProperty(PackageProperty.RepositoryCommit, GitVersion.Sha)
+            .SetProperty(PackageProperty.Copyright, PackageValue.Copyright)
+            .SetProperty(PackageProperty.PackageReadmeFile, PackageValue.Readme)
+            .SetProperty(PackageProperty.PackageIcon, PackageValue.Icon)
             .SetOutputDirectory(ArtifactsDirectory)
         ));
 
     Target Push => _ => _
-        .Description(Descriptions.Push)
+        .Description(Description.Push)
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
-        .Requires(() => NugetApiKey)
-        .Requires(() => NugetApiUrl)
-        .Requires(() => Configuration.Equals(Configuration.Release))
+        .OnlyWhenDynamic(() => IsPublishableBranch) // checked during run. This variable is set in the Print task.
+        .Requires(() => NugetOrgNugetApiKey)
+        .Requires(() => NugetOrgNugetApiUrl)
+        .Requires(() => PackagesNugetApiKey)
+        .Requires(() => PackagesNugetApiUrl)
         .DependsOn(Pack)
         .Executes(() =>
         {
-        var nugetFiles = GlobFiles(ArtifactsDirectory, "*.nupkg");
+            var nugetFiles = ArtifactsDirectory.GlobFiles(FileSystem.Nuget.Packages);
 
-        Assert.NotEmpty(nugetFiles, "There are no Nuget files");
+            Assert.NotEmpty(nugetFiles, LogMessage.NoNugetFiles);
 
-        var branchName = GitVersion.BranchName;
-
-        // if we are on the main branch and it is not a pre-release, publish to Nuget.org
-        if (branchName.StartsWith("release", StringComparison.OrdinalIgnoreCase))
-        {
+            // if it is not a pre-release, publish to Nuget.org
             if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
             {
                 // this publishes to the nuget.org package manager
-                nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
+                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages, StringComparison.OrdinalIgnoreCase))
                     .ForEach(x =>
                     {
                         DotNetNuGetPush(s => s
                             .SetTargetPath(x)
-                            .SetSource(NugetOrgApiUrl)
-                            .SetApiKey(NugetOrgApiKey)
+                            .SetSource(NugetOrgNugetApiUrl)
+                            .SetApiKey(NugetOrgNugetApiKey)
                         );
                     });
             }
-            else if (GitVersion.PreReleaseLabel.Equals("rc"))
-                {
-                    // this publishes to the github packages package manager
-                    nugetFiles.Where(x => !x.EndsWith("symbols.nupkg"))
+            else if (GitVersion.PreReleaseLabel.Equals(BuildType.Ci, StringComparison.OrdinalIgnoreCase) ||
+                GitVersion.PreReleaseLabel.Equals(BuildType.Rc, StringComparison.OrdinalIgnoreCase))
+            {
+                // this publishes to the github packages package manager
+                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages))
                     .ForEach(x =>
-                    {
-                        DotNetNuGetPush(s => s
-                            .SetTargetPath(x)
-                            .SetSource(NugetApiUrl)
-                            .SetApiKey(NugetApiKey)
-                        );
-                    });
-                }
+                {
+                    DotNetNuGetPush(s => s
+                        .SetTargetPath(x)
+                        .SetSource(PackagesNugetApiUrl)
+                        .SetApiKey(PackagesNugetApiKey)
+                    );
+                });
             }
         });
 }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
-
-namespace Invariants
+﻿namespace Invariants
 {
-    public sealed class PackageProperties
+    public sealed class PackageProperty
     {
         public const string Copyright = "Copyright";
         public const string PackageIcon = "PackageIcon";

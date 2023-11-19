@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Build Schema",
   "$ref": "#/definitions/build",
+  "title": "Build Schema",
   "definitions": {
     "build": {
       "type": "object",
@@ -50,18 +50,18 @@
           "type": "boolean",
           "description": "Disables displaying the NUKE logo"
         },
-        "NugetApiKey": {
+        "NugetOrgNugetApiKey": {
           "type": "string",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "NugetApiUrl": {
+        "NugetOrgNugetApiUrl": {
           "type": "string"
         },
-        "NugetOrgApiKey": {
+        "PackagesNugetApiKey": {
           "type": "string",
           "default": "Secrets must be entered via 'nuke :secrets [profile]'"
         },
-        "NugetOrgApiUrl": {
+        "PackagesNugetApiUrl": {
           "type": "string"
         },
         "Partition": {
