@@ -2,7 +2,7 @@
 
 namespace Invariants
 {
-    public sealed class PackageValues
+    public sealed class PackageValue
     {
         public const string Author = "David Rogers";
         public static string Copyright = $"{Author} 2022 - {DateTime.Now.Year}";

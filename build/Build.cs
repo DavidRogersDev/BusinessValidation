@@ -21,8 +21,7 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main() => Execute<Build>(x => x.Push);
-
+    public static int Main() => Execute<Build>(b => b.Push);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -58,21 +57,21 @@ class Build : NukeBuild
     static AbsolutePath ArtifactsDirectory => RootDirectory / FileSystem.ArtifactsDirectory;
 
     Target Print => _ => _
-    .Description(Descriptions.Print)
+    .Description(Description.Print)
     .Executes(() =>
     {
-        Log.Information(LogMessage.ReleaseNotes, ReleaseNotes ?? ProjectValues.NoValue);
+        Log.Information(LogMessage.ReleaseNotes, ReleaseNotes ?? ProjectValue.NoValue);
         Log.Information(LogMessage.RootDirectory, RootDirectory.Name);
         Log.Information(LogMessage.MajorMinorPatch, GitVersion.MajorMinorPatch);
         Log.Information(LogMessage.NugetVersion, GitVersion.NuGetVersion);
-        Log.Information(LogMessage.PreReleaseLabel, GitVersion?.PreReleaseLabel ?? ProjectValues.NoValue);
-        Log.Information(LogMessage.Configuration, Configuration?.ToString() ?? ProjectValues.NoValue);
+        Log.Information(LogMessage.PreReleaseLabel, GitVersion?.PreReleaseLabel ?? ProjectValue.NoValue);
+        Log.Information(LogMessage.Configuration, Configuration?.ToString() ?? ProjectValue.NoValue);
 
         IsPublishableBranch = GitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase);
     });
 
     Target Clean => _ => _
-        .Description(Descriptions.Clean)
+        .Description(Description.Clean)
         .DependsOn(Print)
         .Executes(() =>
         {
@@ -85,7 +84,7 @@ class Build : NukeBuild
         });
 
     Target Restore => _ => _
-    .Description(Descriptions.Restore)
+    .Description(Description.Restore)
     .DependsOn(Clean)
     .Executes(() =>
         {
@@ -97,7 +96,7 @@ class Build : NukeBuild
         });
 
     Target Compile => _ => _
-        .Description(Descriptions.Compile)
+        .Description(Description.Compile)
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -110,7 +109,7 @@ class Build : NukeBuild
                 _.SetProject(Solution)
                 .EnableNoRestore()
                 .SetConfiguration(Configuration)
-                .SetCopyright(PackageValues.Copyright)
+                .SetCopyright(PackageValue.Copyright)
                 .SetAssemblyVersion(GitVersion.AssemblySemFileVer)
                 .SetFileVersion(GitVersion.MajorMinorPatch)
                 .SetVersion(GitVersion.NuGetVersion)
@@ -123,7 +122,7 @@ class Build : NukeBuild
         });
 
     Target Test => _ => _
-    .Description(Descriptions.Test)
+    .Description(Description.Test)
     .DependsOn(Compile)
     .Executes(() =>
     {
@@ -136,7 +135,7 @@ class Build : NukeBuild
     });
 
     Target Pack => _ => _
-    .Description(Descriptions.Pack)
+    .Description(Description.Pack)
     .DependsOn(Test)
     .Executes(() => DotNetPack(s => s
             .SetProject(Solution.BusinessValidation)
@@ -144,35 +143,34 @@ class Build : NukeBuild
             .EnableNoBuild()
             .EnableNoRestore()
             .SetNoDependencies(true)
-            .SetPackageId(ProjectValues.BusinessValidationProject)
-            .SetTitle(ProjectValues.BusinessValidationProject)
+            .SetPackageId(Solution.BusinessValidation.Name)
+            .SetTitle(Solution.BusinessValidation.Name)
             .SetVersion(GitVersion.NuGetVersion)
             .SetRepositoryType(AzurePipelinesRepositoryType.Git.ToString().ToLowerInvariant())
             .SetPackageReleaseNotes(ReleaseNotes)
-            .SetPackageProjectUrl(PackageValues.ProjectUrl)
-            .SetAuthors(PackageValues.Author)
-            .SetProperty(PackageProperties.PackageLicenseExpression, PackageValues.MITLicence)
-            .SetPackageTags(PackageValues.Tags)
+            .SetPackageProjectUrl(PackageValue.ProjectUrl)
+            .SetAuthors(PackageValue.Author)
+            .SetProperty(PackageProperty.PackageLicenseExpression, PackageValue.MITLicence)
+            .SetPackageTags(PackageValue.Tags)
             .SetPackageRequireLicenseAcceptance(false)
-            .SetDescription(PackageValues.Description)
-            .SetRepositoryUrl(PackageValues.RepositoryUrl)
-            .SetProperty(PackageProperties.RepositoryBranch, GitVersion.BranchName)
-            .SetProperty(PackageProperties.RepositoryCommit, GitVersion.Sha)
-            .SetProperty(PackageProperties.Copyright, PackageValues.Copyright)
-            .SetProperty(PackageProperties.PackageReadmeFile, PackageValues.Readme)
-            .SetProperty(PackageProperties.PackageIcon, PackageValues.Icon)
+            .SetDescription(PackageValue.Description)
+            .SetRepositoryUrl(PackageValue.RepositoryUrl)
+            .SetProperty(PackageProperty.RepositoryBranch, GitVersion.BranchName)
+            .SetProperty(PackageProperty.RepositoryCommit, GitVersion.Sha)
+            .SetProperty(PackageProperty.Copyright, PackageValue.Copyright)
+            .SetProperty(PackageProperty.PackageReadmeFile, PackageValue.Readme)
+            .SetProperty(PackageProperty.PackageIcon, PackageValue.Icon)
             .SetOutputDirectory(ArtifactsDirectory)
         ));
 
     Target Push => _ => _
-        .Description(Descriptions.Push)
+        .Description(Description.Push)
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
         .OnlyWhenDynamic(() => IsPublishableBranch) // checked during run. This variable is set in the Print task.
         .Requires(() => NugetOrgNugetApiKey)
         .Requires(() => NugetOrgNugetApiUrl)
         .Requires(() => PackagesNugetApiKey)
         .Requires(() => PackagesNugetApiUrl)
-        .Requires(() => Configuration.Equals(Configuration.Release))
         .DependsOn(Pack)
         .Executes(() =>
         {

@@ -1,6 +1,6 @@
 ﻿namespace Invariants
 {
-    public sealed class Descriptions
+    public sealed class Description
     {
         public const string Clean = "Cleans the project.";
         public const string Compile = "Compiles the project.";
