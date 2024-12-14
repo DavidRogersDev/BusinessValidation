@@ -3,6 +3,7 @@ using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Utilities.Collections;
 using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 
 namespace _build
@@ -28,13 +29,10 @@ namespace _build
             _gitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase) ||
             _gitVersion.BranchName.Equals(Branch.Main, StringComparison.OrdinalIgnoreCase);
 
-        private bool IsReleaseBranch =>
-            _gitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase);
-
         public bool IsTaggedBuild => _gitVersion.PreReleaseTag.IsEmpty();
 
         public bool BuildToBePacked(OverrideMode? overrideMode = null) => overrideMode switch
-        {
+        {            
             OverrideMode.Allow => true,
             OverrideMode.Deny => false,
             _ => IsReleaseOrMainBranch || IsTaggedBuild

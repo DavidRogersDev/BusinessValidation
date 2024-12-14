@@ -29,9 +29,6 @@ class Build : NukeBuild
         _releaseGuard = new ReleaseGuard(GitVersion,
             new PackagePublishConfig(NugetOrgNugetApiKey, NugetOrgNugetApiUrl),
             new PackagePublishConfig(PackagesNugetApiKey, PackagesNugetApiUrl));
-
-        Log.Information("LocalPackOk {L}", LocalPackOk);
-
     }
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -182,6 +179,7 @@ class Build : NukeBuild
     Target Push => _ => _
         .Description(Description.Push)
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
+        .OnlyWhenStatic(() => Configuration.Equals(Configuration.Release))
         .OnlyWhenDynamic(() => _releaseGuard.BuildToBePacked()) // checked during run.
         .Requires(() => NugetOrgNugetApiKey)
         .Requires(() => NugetOrgNugetApiUrl)
@@ -194,31 +192,20 @@ class Build : NukeBuild
 
             Assert.NotEmpty(nugetFiles, LogMessage.NoNugetFiles);
 
-            // if it is not a pre-release, publish to Nuget.org
-            if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
+            PackagePublishConfig record = _releaseGuard.ResolvePublishDestinationDetails();
+             
+            if (record.HasNoValue)
             {
-                // this publishes to the nuget.org package manager
-                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages, StringComparison.OrdinalIgnoreCase))
-                    .ForEach(x =>
-                    {
-                        DotNetNuGetPush(s => s
-                            .SetTargetPath(x)
-                            .SetSource(NugetOrgNugetApiUrl)
-                            .SetApiKey(NugetOrgNugetApiKey)
-                        );
-                    });
+                Log.Information(LogMessage.NothingPushed);
             }
-            else if (GitVersion.PreReleaseLabel.Equals(BuildType.Ci, StringComparison.OrdinalIgnoreCase) ||
-                GitVersion.PreReleaseLabel.Equals(BuildType.Rc, StringComparison.OrdinalIgnoreCase))
+            else
             {
-                // this publishes to the github packages package manager
-                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages))
-                    .ForEach(x =>
+                nugetFiles.ForEach(x =>
                 {
                     DotNetNuGetPush(s => s
                         .SetTargetPath(x)
-                        .SetSource(PackagesNugetApiUrl)
-                        .SetApiKey(PackagesNugetApiKey)
+                        .SetSource(record.Url)
+                        .SetApiKey(record.Token)
                     );
                 });
             }
