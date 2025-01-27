@@ -1,3 +1,4 @@
+using _build;
 using Invariants;
 using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
@@ -15,21 +16,30 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 class Build : NukeBuild
 {
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
+    ReleaseGuard _releaseGuard;
 
-    public static int Main() => Execute<Build>(b => b.Push);
+    public static int Main() => IsLocalBuild
+            ? Execute<Build>(t => t.Pack)
+            : Execute<Build>(t => t.Push);
+
+    protected override void OnBuildInitialized()
+    {
+        base.OnBuildInitialized();
+
+        _releaseGuard = new ReleaseGuard(GitVersion,
+            new PackagePublishConfig(NugetOrgNugetApiKey, NugetOrgNugetApiUrl),
+            new PackagePublishConfig(PackagesNugetApiKey, PackagesNugetApiUrl));
+    }
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-    static bool IsPublishableBranch = false;
 
 
     [Solution(GenerateProjects = true)]
     readonly Solution Solution;
+
+    [Parameter]
+    readonly bool LocalPackOk;
 
     [Parameter]
     readonly bool IgnoreFailedSources;
@@ -67,7 +77,7 @@ class Build : NukeBuild
         Log.Information(LogMessage.PreReleaseLabel, GitVersion?.PreReleaseLabel ?? ProjectValue.NoValue);
         Log.Information(LogMessage.Configuration, Configuration?.ToString() ?? ProjectValue.NoValue);
 
-        IsPublishableBranch = GitVersion.BranchName.StartsWith(Branch.Release, StringComparison.OrdinalIgnoreCase);
+        
     });
 
     Target Clean => _ => _
@@ -136,6 +146,9 @@ class Build : NukeBuild
 
     Target Pack => _ => _
     .Description(Description.Pack)
+    .OnlyWhenDynamic(() => LocalPackOk 
+        ? _releaseGuard.BuildToBePacked(System.Configuration.OverrideMode.Allow)
+        : _releaseGuard.BuildToBePacked()) // checked during run.
     .DependsOn(Test)
     .Executes(() => DotNetPack(s => s
             .SetProject(Solution.BusinessValidation)
@@ -166,7 +179,8 @@ class Build : NukeBuild
     Target Push => _ => _
         .Description(Description.Push)
         .OnlyWhenStatic(() => IsServerBuild) // checked before the build steps run.
-        .OnlyWhenDynamic(() => IsPublishableBranch) // checked during run. This variable is set in the Print task.
+        .OnlyWhenStatic(() => Configuration.Equals(Configuration.Release))
+        .OnlyWhenDynamic(() => _releaseGuard.BuildToBePacked()) // checked during run.
         .Requires(() => NugetOrgNugetApiKey)
         .Requires(() => NugetOrgNugetApiUrl)
         .Requires(() => PackagesNugetApiKey)
@@ -178,31 +192,20 @@ class Build : NukeBuild
 
             Assert.NotEmpty(nugetFiles, LogMessage.NoNugetFiles);
 
-            // if it is not a pre-release, publish to Nuget.org
-            if (string.IsNullOrWhiteSpace(GitVersion.PreReleaseLabel))
+            PackagePublishConfig record = _releaseGuard.ResolvePublishDestinationDetails();
+             
+            if (record.HasNoValue)
             {
-                // this publishes to the nuget.org package manager
-                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages, StringComparison.OrdinalIgnoreCase))
-                    .ForEach(x =>
-                    {
-                        DotNetNuGetPush(s => s
-                            .SetTargetPath(x)
-                            .SetSource(NugetOrgNugetApiUrl)
-                            .SetApiKey(NugetOrgNugetApiKey)
-                        );
-                    });
+                Log.Information(LogMessage.NothingPushed);
             }
-            else if (GitVersion.PreReleaseLabel.Equals(BuildType.Ci, StringComparison.OrdinalIgnoreCase) ||
-                GitVersion.PreReleaseLabel.Equals(BuildType.Rc, StringComparison.OrdinalIgnoreCase))
+            else
             {
-                // this publishes to the github packages package manager
-                nugetFiles.Where(filePath => !filePath.Name.EndsWith(FileSystem.Nuget.SymbolsPackages))
-                    .ForEach(x =>
+                nugetFiles.ForEach(x =>
                 {
                     DotNetNuGetPush(s => s
                         .SetTargetPath(x)
-                        .SetSource(PackagesNugetApiUrl)
-                        .SetApiKey(PackagesNugetApiKey)
+                        .SetSource(record.Url)
+                        .SetApiKey(record.Token)
                     );
                 });
             }
