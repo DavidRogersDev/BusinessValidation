@@ -1,6 +1,4 @@
-﻿using FluentAssertions;
-
-namespace BusinessValidation.Tests
+﻿namespace BusinessValidation.Tests
 {
     public class MergeTests
     {
@@ -31,9 +29,9 @@ namespace BusinessValidation.Tests
 
             var isValid = validator.Merge(validatorFirst);
 
-            ((bool)isValid).Should().BeFalse();
-            isValid[UserNameFailBundleName].Should().Contain(UserNameEmptyMessage);
-            isValid.ValidationMessages.Count.Should().Be(1);
+            ((bool)isValid).ShouldBeFalse();
+            isValid[UserNameFailBundleName].ShouldContain(UserNameEmptyMessage);
+            isValid.ValidationMessages.Count.ShouldBe(1);
         }
         
         [Fact]
@@ -43,9 +41,9 @@ namespace BusinessValidation.Tests
 
             var isValid = validatorFirst.Merge(validator);
 
-            ((bool)isValid).Should().BeFalse();
-            isValid[UserNameFailBundleName].Should().Contain(UserNameEmptyMessage);
-            isValid.ValidationMessages.Count.Should().Be(1);
+            ((bool)isValid).ShouldBeFalse();
+            isValid[UserNameFailBundleName].ShouldContain(UserNameEmptyMessage);
+            isValid.ValidationMessages.Count.ShouldBe(1);
         }
         
         [Fact]
@@ -54,7 +52,7 @@ namespace BusinessValidation.Tests
             var isValid = new Validator()
                 .Merge(new Validator());
 
-            ((bool)isValid).Should().BeTrue();
+            ((bool)isValid).ShouldBeTrue();
         }
         
         [Fact]
@@ -62,12 +60,12 @@ namespace BusinessValidation.Tests
         {
             var isValid = validatorFirst.Merge(validatorSecond);
 
-            ((bool)isValid).Should().BeFalse();
-            isValid.ValidationMessages.Count.Should().Be(3);
-            isValid.ValidationFailures.Count.Should().Be(2);
-            isValid[UserNameFailBundleName].Should().Contain(UserNameAlreadyTakenMessage);
-            isValid[UserNameFailBundleName].Should().Contain(UserNameEmptyMessage);
-            isValid[EmailFailBundleName].Should().Contain(EmailInvalidCharactersMessage);
+            ((bool)isValid).ShouldBeFalse();
+            isValid.ValidationMessages.Count.ShouldBe(3);
+            isValid.ValidationFailures.Count.ShouldBe(2);
+            isValid[UserNameFailBundleName].ShouldContain(UserNameAlreadyTakenMessage);
+            isValid[UserNameFailBundleName].ShouldContain(UserNameEmptyMessage);
+            isValid[EmailFailBundleName].ShouldContain(EmailInvalidCharactersMessage);
         }
         
         [Fact]
@@ -75,7 +73,7 @@ namespace BusinessValidation.Tests
         {
             var isValid = validatorFirst.Merge(validatorNull);
 
-            ((bool)isValid).Should().BeFalse();
+            ((bool)isValid).ShouldBeFalse();
         }
 
         [Fact]
@@ -83,7 +81,7 @@ namespace BusinessValidation.Tests
         {
             var isValid = new Validator().Merge(validatorNull);
 
-            ((bool)isValid).Should().BeTrue();
+            ((bool)isValid).ShouldBeTrue();
         }
 
         [Fact]
@@ -93,12 +91,12 @@ namespace BusinessValidation.Tests
                 .Merge(validatorNull)
                 .Merge(validatorSecond);
 
-            ((bool)isValid).Should().BeFalse();
-            isValid.ValidationMessages.Count.Should().Be(3);
-            isValid.ValidationFailures.Count.Should().Be(2);
-            isValid[UserNameFailBundleName].Should().Contain(UserNameAlreadyTakenMessage);
-            isValid[UserNameFailBundleName].Should().Contain(UserNameEmptyMessage);
-            isValid[EmailFailBundleName].Should().Contain(EmailInvalidCharactersMessage);
+            ((bool)isValid).ShouldBeFalse();
+            isValid.ValidationMessages.Count.ShouldBe(3);
+            isValid.ValidationFailures.Count.ShouldBe(2);
+            isValid[UserNameFailBundleName].ShouldContain(UserNameAlreadyTakenMessage);
+            isValid[UserNameFailBundleName].ShouldContain(UserNameEmptyMessage);
+            isValid[EmailFailBundleName].ShouldContain(EmailInvalidCharactersMessage);
         }
     }
 }

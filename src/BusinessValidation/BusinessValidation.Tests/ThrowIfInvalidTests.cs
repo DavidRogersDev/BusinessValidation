@@ -1,11 +1,4 @@
-﻿using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BusinessValidation.Tests
+﻿namespace BusinessValidation.Tests
 {
     public class ThrowIfInvalidTests
     {
@@ -16,9 +9,7 @@ namespace BusinessValidation.Tests
 
             validator.AddFailure(ValidationInvariables.FailBundle.Name, ValidationInvariables.FailureMessage.FailMessageNameTooShort);
 
-            validator.Invoking(v => v.ThrowIfInvalid())
-                .Should()
-                .Throw<ValidationFailureException>();
+            Should.Throw<ValidationFailureException>(() => validator.ThrowIfInvalid());
         }
         
         [Fact]
@@ -26,9 +17,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.ThrowIfInvalid())
-                .Should()
-                .NotThrow<ValidationFailureException>();
+            Should.NotThrow(() => validator.ThrowIfInvalid());
         }
 
 
@@ -39,15 +28,9 @@ namespace BusinessValidation.Tests
 
             validator.AddFailure(ValidationInvariables.FailBundle.Name, ValidationInvariables.FailureMessage.FailMessageNameTooShort);
 
-            validator.Invoking(v => v.ThrowIfInvalid())
-                .Should()
-                .Throw<ValidationFailureException>()
-                .Which
-                .Failures
-                .Should()
-                .HaveCount(1)
-                .And
-                .ContainKey(ValidationInvariables.FailBundle.Name);
+            Should.Throw<ValidationFailureException>(() => validator.ThrowIfInvalid());
+            validator.ValidationFailures.Count.ShouldBe(1);
+            validator.ValidationFailures.ShouldContainKey(ValidationInvariables.FailBundle.Name);
         }
     }
 }
