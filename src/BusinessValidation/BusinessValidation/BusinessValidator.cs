@@ -2,20 +2,20 @@
 
 namespace BusinessValidation
 {
-    public class BusinessValidator<T> : IBusinessValidator<T>
-        where T : BusinessValidator
+    public abstract class BusinessValidator<T>
     {
-        private readonly T businessValidator;
-        public BusinessValidator(T validator)
+        public BusinessValidator()
         {
-            businessValidator = validator;
+            Validator = new Validator();
+        }
+        
+        public BusinessValidator(Validator validator)
+        {
+            Validator = validator;
         }
 
-        public Validator Validator => this.businessValidator.Validator;
+        public virtual Validator Validator { get; }
 
-        public void ExecuteValidation()
-        {
-            this.businessValidator.ExecuteValidation();
-        }
+        public abstract BusinessValidationResult Validate(T validationObject);
     }
 }

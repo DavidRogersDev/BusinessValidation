@@ -2,22 +2,9 @@
 
 namespace BusinessValidation
 {
-    public interface IBusinessValidator<T>
-        where T : BusinessValidator
+    public interface IBusinessValidator<in T>
     {
-        void ExecuteValidation();
+        BusinessValidationResult Validate(T validationObject);
         Validator Validator { get; }
-    }
-
-    public abstract class BusinessValidator
-    {
-        public BusinessValidator()
-        {
-            Validator = new Validator();
-        }
-
-        public Validator Validator { get; }
-
-        public abstract void ExecuteValidation();
     }
 }

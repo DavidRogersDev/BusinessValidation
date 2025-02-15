@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace ConsoleApp1
 {
-    public class StudentValidator : BusinessValidator<Student>, IBusinessValidator<Student>
+    public class OtherStudentValidator : BusinessValidator<Student>, IBusinessValidator<Student>
     {
-        public StudentValidator()
+        public OtherStudentValidator()
             : base()
         {
         }
@@ -16,6 +16,7 @@ namespace ConsoleApp1
         {
             Validator.AddFailure("Bad", "Bad thing happened");
             Validator.Validate("Bad", "Really Bad thing happened", false);
+            Validator.Validate("Other", "Really Bad thing happened", false);
 
             return new BusinessValidationResult(Validator.ValidationFailures);
         }

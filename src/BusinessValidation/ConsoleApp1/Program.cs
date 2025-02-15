@@ -16,14 +16,26 @@ namespace ConsoleApp1
 
             var sp = services.BuildServiceProvider();
 
-            var studentValidator = sp.GetRequiredService<IBusinessValidator<StudentValidator>>();
-            var subjectValidator = sp.GetRequiredService<IBusinessValidator<SubjectValidator>>();
+            IBusinessValidator<Subject> subjectValidator = sp.GetRequiredService<IBusinessValidator<Subject>>();
+            var studentValidators = sp.GetServices<IBusinessValidator<Student>>();
 
-            studentValidator.ExecuteValidation();            
-            subjectValidator.ExecuteValidation();            
+            var results = studentValidators.Select(i => i.Validate(new Student()));
+            var result2 = subjectValidator.Validate(new Subject());
 
-            Console.WriteLine(studentValidator.Validator.ToString());
+            foreach (var result in results)
+            {
+                Console.WriteLine(result.IsValid);
+            }
+
+            foreach (var studentValidator in studentValidators)
+            {
+                Console.WriteLine(studentValidator.Validator.ToString());
+            }
+
+
             Console.WriteLine(subjectValidator.Validator.ToString());
+            Console.WriteLine(result2.IsValid);
+
         }
     }
 }
