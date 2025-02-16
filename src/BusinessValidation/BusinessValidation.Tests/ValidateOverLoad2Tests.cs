@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using BusinessValidation.Tests.TestDomain;
+﻿using BusinessValidation.Tests.TestDomain;
 using BusinessValidation.Tests.TestDomain.Builders;
 
 namespace BusinessValidation.Tests
@@ -20,7 +19,7 @@ namespace BusinessValidation.Tests
                 b => b.FirstName.Equals(LecturerBuilder.LecturerFirstName)
                 );
 
-            validator.IsValid().Should().BeTrue();
+            validator.IsValid().ShouldBeTrue();
         }
 
         [Fact]
@@ -37,7 +36,7 @@ namespace BusinessValidation.Tests
                 b => b.EmailAddress.EndsWith(ValidationInvariables.GenericTestData.AnuUniSuffix)
                 );
 
-            validator.NotValid().Should().BeTrue();
+            validator.NotValid().ShouldBeTrue();
         }
 
         [Fact]
@@ -54,7 +53,7 @@ namespace BusinessValidation.Tests
                 b => b.FirstName.Equals(LecturerBuilder.LecturerFirstName)
                 );
 
-            isValid.Should().BeTrue();
+            isValid.ShouldBeTrue();
         }
 
         [Fact]
@@ -71,7 +70,7 @@ namespace BusinessValidation.Tests
                 b => b.EmailAddress.EndsWith(ValidationInvariables.GenericTestData.AnuUniSuffix)
                 );
 
-            isValid.Should().BeFalse();
+            isValid.ShouldBeFalse();
         }
 
         [Fact]
@@ -81,13 +80,12 @@ namespace BusinessValidation.Tests
 
             Lecturer bob = null;
 
-            validator.Invoking(v => v.Validate(
+            Should.Throw<ArgumentNullException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,
                 ValidationInvariables.FailureMessage.NotRightNameEmail,
                 bob,
-                b => b.FirstName.Contains(LecturerBuilder.LecturerFirstName)
-            )).Should()
-            .Throw<ArgumentNullException>();
+                b => b.FirstName.Contains(LecturerBuilder.LecturerFirstName)));
+
         }
 
         [Fact]
@@ -104,7 +102,7 @@ namespace BusinessValidation.Tests
                 b => b.FirstName.Length > 4
                 );
 
-            validator.ValidationFailures[string.Empty].Should().Contain(ValidationInvariables.FailureMessage.FailMessageNameTooShort);
+            validator.ValidationFailures[string.Empty].ShouldContain(ValidationInvariables.FailureMessage.FailMessageNameTooShort);
         }
 
 
@@ -115,14 +113,11 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v =>
-                v.Validate(
-                    ValidationInvariables.FailBundle.NullFailBundle, 
-                    ValidationInvariables.FailureMessage.FailMessageNameTooShort, 
-                    bob, 
-                    b => b.FirstName.Length > 4)
-                ).Should()
-                .Throw<ArgumentException>();
+            Should.Throw<ArgumentException>(() => validator.Validate(
+                    ValidationInvariables.FailBundle.NullFailBundle,
+                    ValidationInvariables.FailureMessage.FailMessageNameTooShort,
+                    bob,
+                    b => b.FirstName.Length > 4));
         }
                 
 
@@ -133,13 +128,12 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v => v.Validate(
+            Should.Throw<ArgumentNullException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,
                 ValidationInvariables.FailureMessage.MessageIsNullValue,
                 bob,
-                p => p.FirstName.Length > 4
-            )).Should()
-            .Throw<ArgumentNullException>();
+                p => p.FirstName.Length > 4));
+
         }
 
         [Fact]
@@ -149,13 +143,12 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v => v.Validate(
+
+            Should.Throw<ArgumentException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,
                 "      ",
                 bob,
-                p => p.FirstName.Length > 4
-            )).Should()
-            .Throw<ArgumentException>();
+                p => p.FirstName.Length > 4));
         }
         
         [Fact]
@@ -165,13 +158,12 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v => v.Validate(
+            Should.Throw<ArgumentException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,
                 string.Empty,
                 bob,
-                p => p.FirstName.Length > 4
-            )).Should()
-            .Throw<ArgumentException>();
+                p => p.FirstName.Length > 4));
+
         }
     }
 }
