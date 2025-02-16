@@ -45,29 +45,6 @@ namespace BusinessValidation
             }
         }
 
-        /// <summary>
-        /// Constructor which takes a readonly dictionary of failures as a parameter.
-        /// </summary>
-        /// <param name="failureCollection">Readonly Dictionary of existing failures.</param>
-        /// <exception cref="ArgumentNullException">Thrown if <paramref name="failureCollection"/> is <c>null</c>.</exception>
-        public Validator(IReadOnlyDictionary<string, IReadOnlyList<string>> failureCollection)
-        {
-            if (failureCollection is null)
-            {
-                throw new ArgumentNullException(nameof(failureCollection));
-            }
-
-            Results = new ValidationFailureCollection();
-
-            foreach (var failure in failureCollection)
-            {
-                foreach (var message in failure.Value)
-                {
-                    AddFailure(failure.Key, message);
-                }
-            }
-        }
-
         internal ValidationFailureCollection Results { get; }
 
         /// <summary>
@@ -129,23 +106,6 @@ namespace BusinessValidation
             if (string.IsNullOrWhiteSpace(failureMessage)) throw new ArgumentException($"'{nameof(failureMessage)}' cannot be whitespace.", nameof(failureMessage));
 
             var isValid = predicate(objectToValidate);
-
-            if (!isValid)
-            {
-                AddFailure(failBundle, failureMessage);
-            }
-
-            return isValid;
-        }
-        
-        public bool Validate<T>(string failBundle, string failureMessage, T objectToValidate, Func<bool> predicate)
-            where T : class
-        {
-            if (objectToValidate is null) throw new ArgumentNullException(nameof(objectToValidate));
-            if (failureMessage is null) throw new ArgumentNullException(nameof(failureMessage));
-            if (string.IsNullOrWhiteSpace(failureMessage)) throw new ArgumentException($"'{nameof(failureMessage)}' cannot be whitespace.", nameof(failureMessage));
-
-            var isValid = predicate();
 
             if (!isValid)
             {
