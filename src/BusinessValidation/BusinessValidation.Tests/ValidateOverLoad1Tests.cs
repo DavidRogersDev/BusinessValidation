@@ -1,21 +1,20 @@
-﻿using FluentAssertions;
-using static BusinessValidation.Tests.ValidationInvariables;
+﻿using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
 {
-    public class ValidateOverLoad1Tests 
+    public class ValidateOverLoad1Tests
     {
 
         [Fact]
         public void Validate_Adds_Failure()
         {
             var validator = new Validator();
-            
+
             validator.Validate(FailBundle.Name, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2);
 
-            validator.NotValid().Should().BeTrue();
-            validator.ValidationMessages.Should().Contain(FailureMessage.FailMessageNameTooShort, because: "message should be present in Failure Messages collection.");
-            validator[FailBundle.Name].Should().Contain(FailureMessage.FailMessageNameTooShort, because: $"message should be present in messages of '{FailBundle.Name}' fail bundle.");
+            validator.NotValid().ShouldBeTrue();
+            validator.ValidationMessages.ShouldContain(FailureMessage.FailMessageNameTooShort, "message should be present in Failure Messages collection.");
+            validator[FailBundle.Name].ShouldContain(FailureMessage.FailMessageNameTooShort, $"message should be present in messages of '{FailBundle.Name}' fail bundle.");
         }
 
         [Fact]
@@ -25,11 +24,11 @@ namespace BusinessValidation.Tests
 
             validator.Validate(FailBundle.Name, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length < 3);
 
-            validator.IsValid().Should().BeTrue();
-            validator.ValidationMessages.Should().BeEmpty();
-            validator.ValidationFailures.Should().BeEmpty();
+            validator.IsValid().ShouldBeTrue();
+            validator.ValidationMessages.ShouldBeEmpty();
+            validator.ValidationFailures.ShouldBeEmpty();
         }
-        
+
         [Fact]
         public void Validate_Returns_True_When_Passes()
         {
@@ -37,9 +36,9 @@ namespace BusinessValidation.Tests
 
             var isValid = validator.Validate(FailBundle.Name, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length < 3);
 
-            isValid.Should().BeTrue();
+            isValid.ShouldBeTrue();
         }
-        
+
         [Fact]
         public void Validate_Returns_False_When_Fails()
         {
@@ -47,7 +46,7 @@ namespace BusinessValidation.Tests
 
             var isValid = validator.Validate(FailBundle.Name, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2);
 
-            isValid.Should().BeFalse();
+            isValid.ShouldBeFalse();
         }
 
         [Fact]
@@ -57,7 +56,7 @@ namespace BusinessValidation.Tests
 
             validator.Validate(string.Empty, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2);
 
-            validator.ValidationFailures[string.Empty].Should().Contain(FailureMessage.FailMessageNameTooShort);
+            validator.ValidationFailures[string.Empty].ShouldContain(FailureMessage.FailMessageNameTooShort);
         }
 
 
@@ -66,10 +65,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Invoking(
-                v => v.Validate(FailBundle.NullFailBundle, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2)
-                ).Should()
-                .Throw<ArgumentException>();
+            Should.Throw<ArgumentException>(() => validator.Validate(FailBundle.NullFailBundle, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2));
         }
 
         [Fact]
@@ -77,38 +73,24 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.Validate(
-                FailBundle.Email,
-                null,
-                GenericTestData.VeryShortName.Length > 2
-            )).Should()
-            .Throw<ArgumentNullException>();
+            Should.Throw<ArgumentNullException>(() => validator.Validate(FailBundle.Email, null, GenericTestData.VeryShortName.Length > 2));
+
         }
-        
+
         [Fact]
         public void Add_WhiteSpace_FailMessage_Throws_Exception()
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.Validate(
-                FailBundle.Email,
-                "      ",
-                GenericTestData.VeryShortName.Length > 2
-            )).Should()
-            .Throw<ArgumentException>();
+            Should.Throw<ArgumentException>(() => validator.Validate(FailBundle.Email, "      ", GenericTestData.VeryShortName.Length > 2));
         }
-        
+
         [Fact]
         public void Add_Empty_FailMessage_Throws_Exception()
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.Validate(
-                FailBundle.Email,
-                string.Empty,
-                GenericTestData.VeryShortName.Length > 2
-            )).Should()
-            .Throw<ArgumentException>();
+            Should.Throw<ArgumentException>(() => validator.Validate(FailBundle.Email, string.Empty, GenericTestData.VeryShortName.Length > 2));
         }
     }
 }
