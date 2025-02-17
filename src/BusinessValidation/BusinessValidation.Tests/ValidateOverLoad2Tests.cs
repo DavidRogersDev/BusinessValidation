@@ -3,7 +3,7 @@ using BusinessValidation.Tests.TestDomain.Builders;
 
 namespace BusinessValidation.Tests
 {
-    public class ValidateOverLoad2Tests
+    public sealed class ValidateOverLoad2Tests
     {
         [Fact]
         public void Validate_Valid_Object_With_Predicate_Passes()
