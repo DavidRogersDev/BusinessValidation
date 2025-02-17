@@ -4,7 +4,7 @@ using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
 {
-    public class ValidateOverLoad3Tests
+    public sealed class ValidateOverLoad3Tests
     {
         [Fact]
         public void Validate_Valid_Object_With_Predicate_Passes()
@@ -51,7 +51,7 @@ namespace BusinessValidation.Tests
                 l => l.EmailAddress,
                 ValidationInvariables.FailureMessage.NotRightNameEmail,
                 bob,
-                b => b.FirstName.Equals(LecturerBuilder.LecturerFirstName)
+                b => b.EmailAddress.Equals(LecturerBuilder.LecturerEmail)
                 );
 
             isValid.ShouldBeTrue();
@@ -194,7 +194,7 @@ namespace BusinessValidation.Tests
 
             validator.Validate(
                 p => p.FirstName,
-                "{{fail-bundle}} should be longer than 3 characters.",
+                "{fail-bundle} should be longer than 3 characters.",
                 bob,
                 p => p.FirstName.Length > 3
                 );

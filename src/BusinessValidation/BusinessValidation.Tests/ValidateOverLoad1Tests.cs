@@ -2,7 +2,7 @@
 
 namespace BusinessValidation.Tests
 {
-    public class ValidateOverLoad1Tests
+    public sealed class ValidateOverLoad1Tests
     {
 
         [Fact]
@@ -65,7 +65,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Should.Throw<ArgumentException>(() => validator.Validate(FailBundle.NullFailBundle, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2));
+            Should.Throw<ArgumentNullException>(() => validator.Validate(FailBundle.NullFailBundle, FailureMessage.FailMessageNameTooShort, GenericTestData.VeryShortName.Length > 2));
         }
 
         [Fact]
