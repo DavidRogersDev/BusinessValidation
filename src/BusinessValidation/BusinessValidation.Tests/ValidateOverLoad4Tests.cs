@@ -4,7 +4,7 @@ using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
 {
-    public class ValidateOverLoad4Tests
+    public sealed class ValidateOverLoad4Tests
     {
         [Fact]
         public void Validate_Valid_Object_With_Predicate_Passes()
@@ -51,7 +51,7 @@ namespace BusinessValidation.Tests
                 l => l.EmailAddress,
                 FailureMessage.NotRightNameEmail,
                 bob,
-                bob.FirstName.Equals(LecturerBuilder.LecturerFirstName)
+                bob.EmailAddress.Equals(LecturerBuilder.LecturerEmail)
                 );
 
             isValid.ShouldBeTrue();
@@ -149,7 +149,7 @@ namespace BusinessValidation.Tests
             var bob = LecturerBuilder.Simple().Build();
 
             Should.Throw<ArgumentNullException>(() => validator.Validate(
-                f => f.EmailAddress,
+                f => f.FirstName,
                 FailureMessage.MessageIsNullValue,
                 bob,
                 bob.FirstName.Length > 4));
@@ -163,7 +163,7 @@ namespace BusinessValidation.Tests
             var bob = LecturerBuilder.Simple().Build();
 
             Should.Throw<ArgumentException>(() => validator.Validate(
-                b => b.EmailAddress,
+                f => f.FirstName,
                 "      ",
                 bob,
                 bob.FirstName.Length > 4));
@@ -177,7 +177,7 @@ namespace BusinessValidation.Tests
             var bob = LecturerBuilder.Simple().Build();
 
             Should.Throw<ArgumentException>(() => validator.Validate(
-                b => b.EmailAddress,
+                f => f.FirstName,
                 string.Empty,
                 bob,
                 bob.FirstName.Length > 4));
