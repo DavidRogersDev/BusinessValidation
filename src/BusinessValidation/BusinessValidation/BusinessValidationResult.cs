@@ -16,8 +16,8 @@ namespace BusinessValidation
             ValidationFailures = validator.ValidationFailures;
         }
 
-        public bool IsValid => !ValidationFailures.Any();
-        public bool NotValid => ValidationFailures.Any();
-        public IReadOnlyDictionary<string, IReadOnlyList<string>> ValidationFailures { get; set; }
+        public virtual bool IsValid => !ValidationFailures.Any();
+        public virtual bool NotValid => ValidationFailures.Any();
+        public virtual IReadOnlyDictionary<string, IReadOnlyList<string>> ValidationFailures { get; set; }
     }
 }

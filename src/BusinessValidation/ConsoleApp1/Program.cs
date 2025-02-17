@@ -25,17 +25,17 @@ namespace ConsoleApp1
             foreach (var result in results)
             {
                 Console.WriteLine(result.IsValid);
+                Console.WriteLine(result.ValidationFailures.Count);
             }
 
-            foreach (var studentValidator in studentValidators)
-            {
-                Console.WriteLine(studentValidator.Validator.ToString());
-            }
+            //foreach (var studentValidator in studentValidators)
+            //{
+            //    Console.WriteLine(studentValidator.Validator.ToString());                
+            //}
 
 
             Console.WriteLine(subjectValidator.Validator.ToString());
             Console.WriteLine(result2.IsValid);
-
         }
     }
 }
