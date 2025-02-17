@@ -1,4 +1,3 @@
-using FluentAssertions;
 using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
@@ -15,9 +14,9 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.ValidationFailures.Should().NotBeNull();
-            validator.ValidationFailures.Count.Should().Be(0);
-            ((bool)validator).Should().BeTrue();
+            validator.ValidationFailures.ShouldNotBeNull();
+            validator.ValidationFailures.Count.ShouldBe(0);
+            ((bool)validator).ShouldBeTrue();
         }
         
         [Fact]
@@ -25,8 +24,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.ValidationMessages.Should().NotBeNull();
-            validator.ValidationMessages.Count().Should().Be(0);
+            validator.ValidationMessages.ShouldNotBeNull();
+            validator.ValidationMessages.Count().ShouldBe(0);
         }
         
         [Fact]
@@ -34,7 +33,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.IsValid().Should().BeTrue();
+            validator.IsValid().ShouldBeTrue();
         }
 
         [Fact]
@@ -44,8 +43,8 @@ namespace BusinessValidation.Tests
 
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
-            validator.IsValid().Should().BeFalse();
-            ((bool)validator).Should().BeFalse();
+            validator.IsValid().ShouldBeFalse();
+            ((bool)validator).ShouldBeFalse();
         }
         
         [Fact]
@@ -55,7 +54,7 @@ namespace BusinessValidation.Tests
 
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
-            validator.NotValid().Should().BeTrue();
+            validator.NotValid().ShouldBeTrue();
         }
         
         [Fact]
@@ -65,7 +64,7 @@ namespace BusinessValidation.Tests
 
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
-            validator.ValidationFailures.Should().ContainKey(FailBundleName);
+            validator.ValidationFailures.ShouldContainKey(FailBundleName);
         }
         
         [Fact]
@@ -75,8 +74,8 @@ namespace BusinessValidation.Tests
 
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
-            validator[FailBundleName].Count.Should().Be(1);
-            validator[FailBundleName].Should().Contain(NotRightNameErrorMessage);
+            validator[FailBundleName].Count.ShouldBe(1);
+            validator[FailBundleName].ShouldContain(NotRightNameErrorMessage);
         }
         
         [Fact]
@@ -88,8 +87,7 @@ namespace BusinessValidation.Tests
 
             validator[FailBundleName]                
                 .Single()
-                .Should()
-                .Be(NotRightNameErrorMessage);
+                .ShouldBe(NotRightNameErrorMessage);
         }
         
         [Fact]
@@ -101,8 +99,7 @@ namespace BusinessValidation.Tests
 
             validator.ValidationMessages
                 .Single()
-                .Should()
-                .Be(NotRightNameErrorMessage);
+                .ShouldBe(NotRightNameErrorMessage);
         }
         
         [Fact]
@@ -113,7 +110,7 @@ namespace BusinessValidation.Tests
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
             validator.AddFailure(FailBundleAge, FailureMessage.PersonTooYoung);
 
-            validator.ValidationFailures.Count.Should().BeGreaterThan(0);
+            validator.ValidationFailures.Count.ShouldBeGreaterThan(0);
         }
         
         [Fact]
@@ -124,9 +121,9 @@ namespace BusinessValidation.Tests
             validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
             validator.AddFailure(FailBundleAge, FailureMessage.PersonTooYoung);
 
-            validator.ValidationMessages.Count().Should().Be(2);
-            validator.ValidationMessages.Should().Contain(NotRightNameErrorMessage);
-            validator.ValidationMessages.Should().Contain(FailureMessage.PersonTooYoung);
+            validator.ValidationMessages.Count().ShouldBe(2);
+            validator.ValidationMessages.ShouldContain(NotRightNameErrorMessage);
+            validator.ValidationMessages.ShouldContain(FailureMessage.PersonTooYoung);
         }
         
         [Fact]
@@ -138,7 +135,8 @@ namespace BusinessValidation.Tests
             validator.AddFailure(FailBundleName, FailMessageNameTooShort);
             validator.AddFailure(FailBundleAge, FailureMessage.PersonTooYoung);
 
-            validator.ValidationFailures[FailBundleName].Should().Contain(FailMessageNameTooShort).And.Contain(NotRightNameErrorMessage);
+            validator.ValidationFailures[FailBundleName].ShouldContain(FailMessageNameTooShort);
+            validator.ValidationFailures[FailBundleName].ShouldContain(NotRightNameErrorMessage);
         }
         
         [Fact]
@@ -149,7 +147,8 @@ namespace BusinessValidation.Tests
             validator.AddFailure(string.Empty, NotRightNameErrorMessage);
             validator.AddFailure(string.Empty, FailMessageNameTooShort);           
 
-            validator.ValidationFailures[string.Empty].Should().Contain(FailMessageNameTooShort).And.Contain(NotRightNameErrorMessage);
+            validator.ValidationFailures[string.Empty].ShouldContain(FailMessageNameTooShort);
+            validator.ValidationFailures[string.Empty].ShouldContain(NotRightNameErrorMessage);
         }
         
         [Fact]
@@ -157,9 +156,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.AddFailure(FailBundle.NullFailBundle, NotRightNameErrorMessage))
-                .Should()
-                .Throw<ArgumentNullException>();
+            Should.Throw<ArgumentNullException>(() => validator.AddFailure(FailBundle.NullFailBundle, NotRightNameErrorMessage));
         }
         
         [Fact]
@@ -167,9 +164,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Invoking(v => v.AddFailure(FailBundleName, FailureMessage.MessageIsNullValue))
-                .Should()
-                .Throw<ArgumentNullException>();
+            Should.Throw<ArgumentNullException>(() => validator.AddFailure(FailBundleName, FailureMessage.MessageIsNullValue));
         }
         
         [Fact]
@@ -179,9 +174,7 @@ namespace BusinessValidation.Tests
 
             string message = string.Empty;
 
-            validator.Invoking(v => v.AddFailure(FailBundleName, message))
-                .Should()
-                .Throw<ArgumentException>();
+            Should.Throw<ArgumentException>(() => validator.AddFailure(FailBundleName, message));
         }
         
         [Fact]
@@ -191,9 +184,7 @@ namespace BusinessValidation.Tests
 
             string message = "       ";
 
-            validator.Invoking(v => v.AddFailure(FailBundleName, message))
-                .Should()
-                .Throw<ArgumentException>();
+            Should.Throw<ArgumentException>(() => validator.AddFailure(FailBundleName, message));
         }
         
         [Fact]
@@ -203,8 +194,8 @@ namespace BusinessValidation.Tests
 
             var val = validator.AddFailure(FailBundleName, NotRightNameErrorMessage);
 
-            val.Should().NotBeNull();
-            val.Should().BeSameAs(validator);
+            val.ShouldNotBeNull();
+            val.ShouldBeSameAs(validator);
         }
     }
 }

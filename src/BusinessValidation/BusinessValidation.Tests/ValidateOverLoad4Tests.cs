@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using BusinessValidation.Tests.TestDomain;
+﻿using BusinessValidation.Tests.TestDomain;
 using BusinessValidation.Tests.TestDomain.Builders;
 using static BusinessValidation.Tests.ValidationInvariables;
 
@@ -21,7 +20,7 @@ namespace BusinessValidation.Tests
                 bob.FirstName.Equals(LecturerBuilder.LecturerFirstName)
                 );
 
-            validator.IsValid().Should().BeTrue();
+            validator.IsValid().ShouldBeTrue();
         }
 
         [Fact]
@@ -38,7 +37,7 @@ namespace BusinessValidation.Tests
                 bob.CurrentlyRostered.Equals(false)
                 );
 
-            validator.NotValid().Should().BeTrue();
+            validator.NotValid().ShouldBeTrue();
         }
 
         [Fact]
@@ -55,7 +54,7 @@ namespace BusinessValidation.Tests
                 bob.FirstName.Equals(LecturerBuilder.LecturerFirstName)
                 );
 
-            isValid.Should().BeTrue();
+            isValid.ShouldBeTrue();
         }
 
         [Fact]
@@ -72,7 +71,7 @@ namespace BusinessValidation.Tests
                 bob.EmailAddress.EndsWith(GenericTestData.AnuUniSuffix)
                 );
 
-            isValid.Should().BeFalse();
+            isValid.ShouldBeFalse();
         }
         
         [Fact]
@@ -89,7 +88,7 @@ namespace BusinessValidation.Tests
                 bob.Address.PostCode > 5000
                 );
 
-            validator.ValidationFailures.Single().Key.Should().Be(FailBundle.AddressPostcode);
+            validator.ValidationFailures.Single().Key.ShouldBe(FailBundle.AddressPostcode);
         }
         
         [Fact]
@@ -107,7 +106,7 @@ namespace BusinessValidation.Tests
                 PropertyDepth.FullPath
                 );
 
-            validator.ValidationFailures.Single().Key.Should().Be(FailBundle.AddressPostcode);
+            validator.ValidationFailures.Single().Key.ShouldBe(FailBundle.AddressPostcode);
         }
         
         [Fact]
@@ -125,7 +124,7 @@ namespace BusinessValidation.Tests
                 PropertyDepth.TerminatingProperty
                 );
 
-            validator.ValidationFailures.Single().Key.Should().Be(FailBundle.PostCode);
+            validator.ValidationFailures.Single().Key.ShouldBe(FailBundle.PostCode);
         }
 
         [Fact]
@@ -135,14 +134,11 @@ namespace BusinessValidation.Tests
 
             Lecturer bob = null;
 
-            validator.Invoking(
-                v => v.Validate(
+            Should.Throw<ArgumentNullException>(() => validator.Validate(
                 f => f.EmailAddress,
                 FailureMessage.NotRightNameEmail,
                 bob,
-                true
-            )).Should()
-            .Throw<ArgumentNullException>();
+                true));
         }
 
         [Fact]
@@ -152,13 +148,11 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v => v.Validate(
+            Should.Throw<ArgumentNullException>(() => validator.Validate(
                 f => f.EmailAddress,
                 FailureMessage.MessageIsNullValue,
                 bob,
-                bob.FirstName.Length > 4
-            )).Should()
-            .Throw<ArgumentNullException>();
+                bob.FirstName.Length > 4));
         }
 
         [Fact]
@@ -168,13 +162,11 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v => v.Validate(
+            Should.Throw<ArgumentException>(() => validator.Validate(
                 b => b.EmailAddress,
                 "      ",
                 bob,
-                bob.FirstName.Length > 4
-            )).Should()
-            .Throw<ArgumentException>();
+                bob.FirstName.Length > 4));
         }
 
         [Fact]
@@ -184,13 +176,11 @@ namespace BusinessValidation.Tests
 
             var bob = LecturerBuilder.Simple().Build();
 
-            validator.Invoking(v => v.Validate(
+            Should.Throw<ArgumentException>(() => validator.Validate(
                 b => b.EmailAddress,
                 string.Empty,
                 bob,
-                bob.FirstName.Length > 4
-            )).Should()
-            .Throw<ArgumentException>();
+                bob.FirstName.Length > 4));
         }
 
         [Fact]
@@ -207,7 +197,7 @@ namespace BusinessValidation.Tests
                 bob.FirstName.Length > 3
                 );
 
-            validator[FailBundle.FirstName].Single().Should().Be($"FirstName {PartMessage.LongerThanThreeChars}");
+            validator[FailBundle.FirstName].Single().ShouldBe($"FirstName {PartMessage.LongerThanThreeChars}");
         }
 
         [Fact]
@@ -224,7 +214,7 @@ namespace BusinessValidation.Tests
                 bob.FirstName.Length > 3
                 );
 
-            validator[FailBundle.FirstName].Single().Should().Be($"The FirstName 'Bob' {PartMessage.LongerThanThreeChars}");
+            validator[FailBundle.FirstName].Single().ShouldBe($"The FirstName 'Bob' {PartMessage.LongerThanThreeChars}");
         }
     }
 }
