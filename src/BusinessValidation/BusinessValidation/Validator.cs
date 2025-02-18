@@ -172,11 +172,11 @@ namespace BusinessValidation
 
             var path = ExtractPath(expression, propertyDepth);
 
-            var failBundleToken = "{{fail-bundle}}";
-            var failBundleTokenEscaped = "{fail-bundle}";
-
             if (!condition)
             {
+                var failBundleToken = "{{fail-bundle}}";
+                var failBundleTokenEscaped = "{fail-bundle}";
+
                 if (failureMessage.Contains(failBundleToken, StringComparison.OrdinalIgnoreCase))
                 {
                     AddFailure(path, failureMessage.Replace(failBundleToken, path));
@@ -218,11 +218,11 @@ namespace BusinessValidation
 
             var path = ExtractPath(expression, propertyDepth);
 
-            var failBundleToken = "{{fail-bundle}}";
-            var failBundleTokenEscaped = "{fail-bundle}";
-
             if (!condition)
             {
+                var failBundleToken = "{{fail-bundle}}";
+                var failBundleTokenEscaped = "{fail-bundle}";
+
                 if (failureMessage.Contains(failBundleToken, StringComparison.OrdinalIgnoreCase))
                 {
                     AddFailure(path, failureMessage.Replace(failBundleToken, path));
@@ -264,12 +264,13 @@ namespace BusinessValidation
 
             var path = ExtractPath(expression, propertyDepth);
 
-            var failBundleToken = "{{fail-bundle}}";
-            var failBundleTokenEscaped = "{fail-bundle}";
             var isValid = predicate(objectToValidate);
 
             if (!isValid)
             {
+                var failBundleToken = "{{fail-bundle}}";
+                var failBundleTokenEscaped = "{fail-bundle}";
+
                 if (failureMessage.Contains(failBundleToken, StringComparison.OrdinalIgnoreCase))
                 {
                     AddFailure(path, failureMessage.Replace(failBundleToken, path));
