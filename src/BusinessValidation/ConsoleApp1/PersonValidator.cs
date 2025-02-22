@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
-    public class PersonValidator : BusinessValidator<Student>, IBusinessValidator<Student>
+    public class PersonValidator : BusinessValidator<Student>
     {
         public PersonValidator()
         {

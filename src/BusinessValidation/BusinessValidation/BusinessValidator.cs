@@ -2,7 +2,7 @@
 
 namespace BusinessValidation
 {
-    public abstract class BusinessValidator<T>
+    public abstract class BusinessValidator<T> : IBusinessValidator<T>
     {
         public BusinessValidator()
         {
