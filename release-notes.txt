@@ -1,0 +1,2 @@
+Added overloads of the Validate method that process a parameterless predicate Func.
+Small perf improvement for overloads that replace string tokens.
