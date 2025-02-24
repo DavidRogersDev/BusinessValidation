@@ -106,7 +106,7 @@ namespace BusinessValidation
         /// </summary>        
         /// <param name="failBundle"></param>
         /// <param name="failureMessage"></param>        
-        /// <param name="predicate"></param>
+        /// <param name="predicate">A func delegate of type <see cref="T:Func&lt;T, Boolean&gt;" /> for validation based on that predicate.</param>
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="failBundle"/>, <paramref name="failureMessage"/> or <paramref name="predicate"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Thrown if <paramref name="failureMessage"/> is white space.</exception>
@@ -128,9 +128,9 @@ namespace BusinessValidation
         /// Validates a general predicate returning a <see cref="Boolean"/>.
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
-        /// <param name="expression">An expression of type <see cref="Expression&lt;Func&gt;T&lt;TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
+        /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
-        /// <param name="predicate">A func delegate of type <see cref="T:Func&lt;T, Boolean&gt;" /> providing a condition typed to an object of type <typeparamref name="T"/> for validation of that object.</param>
+        /// <param name="predicate">A func delegate of type <see cref="T:Func&lt;T, Boolean&gt;" /> for validation based on that predicate.</param>
         /// <param name="propertyDepth">An enum of type <see cref="PropertyDepth" /> specifying whether the fullpath, or the terminating property, of the lambda in the first argument is to be added as the name of the fail-bundle. Fullpath is the default. E.g. if the lambda is p => p.Person.Address.Suburb, the name added will be "Person.Address.Suburb".</param>
         /// <returns>A <see cref="Boolean"/> representing the result of the validation check.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="expression"/>, <paramref name="failureMessage"/> or <paramref name="predicate"/> is <c>null</c>.</exception>
@@ -200,7 +200,7 @@ namespace BusinessValidation
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
         /// <typeparam name="TM">Type of the property of the object upon which validation is to be performed on.</typeparam>
-        /// <param name="expression">An expression of type <see cref="Expression&lt;Func&gt;T&lt;TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
+        /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="condition">The condition, or business rule, to validate.</param>
         /// <param name="propertyDepth">An enum of type <see cref="PropertyDepth" /> specifying whether the fullpath, or the terminating property, of the lambda in the first argument is to be added as the name of the fail-bundle. Fullpath is the default. E.g. if the lambda is p => p.Person.Address.Suburb, the name added will be "Person.Address.Suburb".</param>
@@ -243,7 +243,7 @@ namespace BusinessValidation
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
         /// <typeparam name="TM">Type of the property of the object upon which validation is to be performed on.</typeparam>
-        /// <param name="expression">An expression of type <see cref="Expression&lt;Func&gt;T&lt;TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
+        /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="objectToValidate">An object of the given type <typeparamref name="T"/> to validate.</param>
         /// <param name="condition">The condition, or business rule, to validate.</param>
@@ -289,7 +289,7 @@ namespace BusinessValidation
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
         /// <typeparam name="TM">Type of the property of the object upon which validation is to be performed on.</typeparam>
-        /// <param name="expression">An expression of type <see cref="Expression&lt;Func&gt;T&lt;TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
+        /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="objectToValidate">An object of the given type <typeparamref name="T"/> to validate.</param>
         /// <param name="predicate">A func delegate of type <see cref="T:Func&lt;T, Boolean&gt;" /> providing a condition typed to an object of type <typeparamref name="T"/> for validation of that object.</param>
