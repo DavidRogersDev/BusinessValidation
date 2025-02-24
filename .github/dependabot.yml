@@ -1,0 +1,24 @@
+version: 2
+updates:
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '16:00'
+      timezone: 'australia/adelaide'
+
+  - package-ecosystem: 'nuget'
+    directory: '/src/BusinessValidation'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '16:00'
+      timezone: 'australia/adelaide'
+    groups:
+      xunit:
+        patterns:
+          - 'xunit*'
+      nuke:
+        patterns:
+          - 'Nuke*'
