@@ -1,9 +1,6 @@
-﻿using _build;
-using Invariants;
+﻿using Invariants;
 using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
-using Nuke.Common.Execution;
-using Nuke.Common.Execution.Theming;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
@@ -15,9 +12,10 @@ using Nuke.Common.Utilities.Collections;
 using Serilog;
 using System;
 using System.Linq;
+using _build;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
-class Build : NukeBuild
+internal class Build : NukeBuild
 {
     ReleaseGuard _releaseGuard;
 
@@ -32,58 +30,42 @@ class Build : NukeBuild
         _releaseGuard = new ReleaseGuard(GitVersion,
             new PackagePublishConfig(NugetOrgNugetApiKey, NugetOrgNugetApiUrl),
             new PackagePublishConfig(PackagesNugetApiKey, PackagesNugetApiUrl));
+    }
 
-        string printHeader = "PRINT SELECTED VALUES";
-        Console.WriteLine(Environment.NewLine + '╬' + '═'.Repeat(printHeader.Length + 5));
-        Console.WriteLine("║ " + printHeader);
-        Console.WriteLine('╬' + '═'.Repeat(printHeader.Length - 4) + Environment.NewLine);
+    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
+    readonly Configuration Configuration = IsLocalBuild 
+        ? Configuration.Debug 
+        : Configuration.Release;
+    [GitVersion(NoFetch = false)] 
+    readonly GitVersion GitVersion;
+    [Solution(GenerateProjects = true)]
+    readonly Solution Solution;
 
+    [Parameter] readonly bool IgnoreFailedSources;
+    [Parameter] readonly bool LocalPackOk;
+    [Parameter] readonly string NugetOrgNugetApiUrl;
+    [Parameter][Secret] readonly string NugetOrgNugetApiKey;
+    [Parameter] readonly string PackagesNugetApiUrl;
+    [Parameter][Secret] readonly string PackagesNugetApiKey;    
+    [Parameter] readonly string ReleaseNotes;
+
+    static AbsolutePath ArtifactsDirectory => RootDirectory / FileSystem.ArtifactsDirectory;
+
+    Target Print => _ => _
+    .Description(Description.Print)
+    .Executes(() =>
+    {
         Log.Information(LogMessage.ReleaseNotes, ReleaseNotes ?? ProjectValue.NoValue);
         Log.Information(LogMessage.RootDirectory, RootDirectory.Name);
         Log.Information(LogMessage.MajorMinorPatch, GitVersion.MajorMinorPatch);
         Log.Information(LogMessage.NugetVersion, GitVersion.NuGetVersion);
         Log.Information(LogMessage.PreReleaseLabel, GitVersion?.PreReleaseLabel ?? ProjectValue.NoValue);
         Log.Information(LogMessage.Configuration, Configuration?.ToString() ?? ProjectValue.NoValue);
-    }
-
-    [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
-
-
-    [Solution(GenerateProjects = true)]
-    readonly Solution Solution;
-
-    [Parameter]
-    readonly bool LocalPackOk;
-
-    [Parameter]
-    readonly bool IgnoreFailedSources;
-
-    [Parameter]
-    readonly string ReleaseNotes;
-
-    [GitVersion(NoFetch = false)]
-    readonly GitVersion GitVersion;
-
-    [Parameter]
-    readonly string PackagesNugetApiUrl;
-
-    [Parameter]
-    [Secret]
-    readonly string PackagesNugetApiKey;
-
-    [Parameter]
-    readonly string NugetOrgNugetApiUrl;
-
-    [Parameter]
-    [Secret]
-    readonly string NugetOrgNugetApiKey;
-
-    static AbsolutePath ArtifactsDirectory => RootDirectory / FileSystem.ArtifactsDirectory;
-
+    });
 
     Target Clean => _ => _
-        .Description(Description.Clean)        
+        .Description(Description.Clean)
+        .DependsOn(Print)
         .Executes(() =>
         {
             Log.Information(LogMessage.CleaningBinaryDirectories);
@@ -147,7 +129,7 @@ class Build : NukeBuild
 
     Target Pack => _ => _
     .Description(Description.Pack)
-    .OnlyWhenDynamic(() => LocalPackOk 
+    .OnlyWhenDynamic(() => LocalPackOk
         ? _releaseGuard.BuildToBePacked(System.Configuration.OverrideMode.Allow)
         : _releaseGuard.BuildToBePacked()) // checked during run.
     .DependsOn(Test)
@@ -194,7 +176,7 @@ class Build : NukeBuild
             Assert.NotEmpty(nugetFiles, LogMessage.NoNugetFiles);
 
             PackagePublishConfig record = _releaseGuard.ResolvePublishDestinationDetails();
-             
+
             if (record.HasNoValue)
             {
                 Log.Information(LogMessage.NothingPushed);
