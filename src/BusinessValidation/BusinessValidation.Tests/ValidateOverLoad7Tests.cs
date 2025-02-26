@@ -1,21 +1,19 @@
-﻿using BusinessValidation.Tests.TestDomain.Builders;
+﻿using BusinessValidation.Tests.TestDomain;
+using BusinessValidation.Tests.TestDomain.Builders;
 using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
 {
-    public sealed class ValidateOverLoad5Tests
+    public sealed class ValidateOverLoad7Tests
     {
-        private const string FirstNameKey = "FirstName";
 
         [Fact]
         public void Validate_Valid_Object_With_Predicate_Passes()
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
-
-            validator.Validate(
-                FirstNameKey,
+            validator.Validate<Lecturer, string>(
+                f => f.FirstName,
                 FailureMessage.NotRightNameErrorMessage,
                 () =>
                 {
@@ -31,8 +29,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            validator.Validate(
-                "CurrentlyRostered",
+            validator.Validate<Lecturer, bool>(
+                f => f.CurrentlyRostered,
                 FailureMessage.NotRightNameEmail,
                 () =>
                 {
@@ -48,8 +46,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var isValid = validator.Validate(
-                FirstNameKey,
+            var isValid = validator.Validate<Lecturer, string>(
+                f => f.FirstName,
                 FailureMessage.NotRightNameEmail,
                 () =>
                 {
@@ -65,8 +63,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var isValid = validator.Validate(
-                "EmailAddress",
+            var isValid = validator.Validate<Lecturer, string>(
+                f => f.EmailAddress,
                 FailureMessage.NotRightNameEmail,
                 () =>
                 {
@@ -83,8 +81,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Should.Throw<ArgumentNullException>(() => validator.Validate(
-                FirstNameKey,
+            Should.Throw<ArgumentNullException>(() => validator.Validate<Lecturer, string>(
+                f => f.FirstName,
                 FailureMessage.MessageIsNullValue,
                 () =>
                 {
@@ -98,8 +96,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Should.Throw<ArgumentException>(() => validator.Validate(
-                FirstNameKey,
+            Should.Throw<ArgumentException>(() => validator.Validate<Lecturer, string>(
+                f => f.FirstName,
                 "      ",
                 () =>
                 {
@@ -113,8 +111,8 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Should.Throw<ArgumentException>(() => validator.Validate(
-                FirstNameKey,
+            Should.Throw<ArgumentException>(() => validator.Validate<Lecturer, string>(
+                f => f.FirstName,
                 string.Empty,
                 () =>
                 {

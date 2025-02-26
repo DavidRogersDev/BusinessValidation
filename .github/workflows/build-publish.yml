@@ -7,11 +7,11 @@ on:
       - develop/**
     tags:
       - '\d+\.\d+\.\d+'
-
     paths-ignore:
       - '**/*.md'
       - 'LICENCE'
-  
+  workflow_dispatch:
+
 jobs:
   build:
     name: Build and Release 🏗️
