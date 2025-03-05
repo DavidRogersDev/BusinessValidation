@@ -128,6 +128,7 @@ namespace BusinessValidation
         /// Validates a general predicate returning a <see cref="Boolean"/>.
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
+        /// <typeparam name="TM">Type of the property on the object which will constitute the name of the fail-bundle.</typeparam>
         /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="predicate">A func delegate of type <see cref="T:Func&lt;T, Boolean&gt;" /> for validation based on that predicate.</param>
@@ -199,7 +200,7 @@ namespace BusinessValidation
         /// Validates a condition.
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
-        /// <typeparam name="TM">Type of the property of the object upon which validation is to be performed on.</typeparam>
+        /// <typeparam name="TM">Type of the property on the object which will constitute the name of the fail-bundle.</typeparam>
         /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="condition">The condition, or business rule, to validate.</param>
@@ -242,7 +243,7 @@ namespace BusinessValidation
         /// Validates a condition.
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
-        /// <typeparam name="TM">Type of the property of the object upon which validation is to be performed on.</typeparam>
+        /// <typeparam name="TM">Type of the property on the object which will constitute the name of the fail-bundle.</typeparam>
         /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="objectToValidate">An object of the given type <typeparamref name="T"/> to validate.</param>
@@ -288,7 +289,7 @@ namespace BusinessValidation
         /// Validates a predicate.
         /// </summary>
         /// <typeparam name="T">Type of the object upon which validation is to be performed on.</typeparam>
-        /// <typeparam name="TM">Type of the property of the object upon which validation is to be performed on.</typeparam>
+        /// <typeparam name="TM">Type of the property on the object which will constitute the name of the fail-bundle.</typeparam>
         /// <param name="expression">An expression of type <see cref="T:Expression&lt;Func&lt;T,TM&gt;&gt;" /> enabling the selection of a property on the object to validate, without using a string.</param>
         /// <param name="failureMessage">The message for the validation failure.</param>
         /// <param name="objectToValidate">An object of the given type <typeparamref name="T"/> to validate.</param>

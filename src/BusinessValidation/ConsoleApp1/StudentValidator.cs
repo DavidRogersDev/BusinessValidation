@@ -6,12 +6,6 @@ namespace ConsoleApp1
 {
     public class StudentValidator : BusinessValidator<Student>, IBusinessValidator<Student>
     {
-        public StudentValidator()
-            : base()
-        {
-        }
-
-
         public override BusinessValidationResult Validate(Student validationObject)
         {
             Validator.AddFailure("Bad", "Bad thing happened");

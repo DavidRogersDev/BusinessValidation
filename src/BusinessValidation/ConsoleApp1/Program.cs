@@ -1,5 +1,6 @@
 ﻿using AthleteDomain;
 using BusinessValidation;
+using BusinessValidation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -15,10 +16,12 @@ namespace ConsoleApp1
             Assembly domainAssembly = Assembly.GetAssembly(typeof(Athlete));
 
             services.AddBusinessValidation([assembly, domainAssembly]);
+            services.AddScoped<Validator>(sp => new Validator());
 
             var sp = services.BuildServiceProvider();
 
-            IBusinessValidator<Subject> subjectValidator = sp.GetRequiredService<IBusinessValidator<Subject>>();
+            IBusinessValidator<Subject> subjectValidator = 
+                sp.GetService<IBusinessValidator<Subject>>();
             var studentValidators = sp.GetServices<IBusinessValidator<Student>>();
             var athleteValidators = sp.GetServices<IBusinessValidator<Athlete>>();
 
@@ -33,6 +36,8 @@ namespace ConsoleApp1
             //    Console.WriteLine(result.IsValid);
             //    Console.WriteLine(result.ValidationFailures.Count);
             //}
+
+            //new BusinessValidationResult()
 
             foreach (var result in results.Select(v => v.ValidationFailures))
             {
@@ -52,6 +57,16 @@ namespace ConsoleApp1
 
             var resultAthlete = athleteValidator.Validate(new Athlete { Id = 0, Team = Guid.Empty, Name = "Name" });
             var resultAthleteLocal = localAthleteValidator.Validate(new Athlete { Id = 0, Team = Guid.Empty, Name = "Name" });
+
+            try
+            {
+                localAthleteValidator.Validator.ThrowIfInvalid();
+            }
+            catch (ValidationFailureException e)
+            {
+
+                Console.WriteLine(e.Failures);
+            }
         }
     }
 }
