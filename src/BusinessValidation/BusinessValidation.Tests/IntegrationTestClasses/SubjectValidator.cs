@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace BusinessValidation.Tests.IntegrationTestClasses
+﻿namespace BusinessValidation.Tests.IntegrationTestClasses
 {
     public class SubjectValidator : BusinessValidator<Subject>
     {

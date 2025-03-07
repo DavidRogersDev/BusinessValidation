@@ -41,5 +41,36 @@ namespace BusinessValidation
         /// The validation failures <see cref="IReadOnlyDictionary&lt;string, IReadOnlyList&lt;string&lt;&gt;" /> which is the core of the result.
         /// </summary>
         public virtual IReadOnlyDictionary<string, IReadOnlyList<string>> ValidationFailures { get; set; }
+
+        /// <summary>
+        /// Merges one <see cref="BusinessValidationResult"/> object with another.
+        /// </summary>
+        /// <param name="other">Another <see cref="BusinessValidationResult"/> object to merge with the one invoking this method.</param>
+        /// <returns>The <see cref="BusinessValidationResult"/> object to enable chaining.</returns>
+        public virtual BusinessValidationResult Merge(BusinessValidationResult other)
+        {
+            if (other is null || other.IsValid)
+                return this;
+
+            if (IsValid && other.NotValid)
+                return other;
+
+            // if reach here, both this and other are invalid.
+            var newValidator = new Validator();
+
+            foreach (var failBundle in ValidationFailures)
+            {
+                foreach (var failureMessage in failBundle.Value)
+                    newValidator.AddFailure(failBundle.Key, failureMessage);
+            }
+
+            foreach (var errorKey in other.ValidationFailures)
+            {
+                foreach (var failureMessage in errorKey.Value)
+                    newValidator.AddFailure(errorKey.Key, failureMessage);
+            }
+
+            return new BusinessValidationResult(newValidator);
+        }
     }
 }

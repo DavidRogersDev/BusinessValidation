@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,13 +21,18 @@ namespace BusinessValidation.Extensions
         public static IServiceCollection AddBusinessValidation(this IServiceCollection services, IEnumerable<Assembly> assemblies, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
             var types = assemblies.SelectMany(t => t.GetExportedTypes()
-                .Where(t => t.IsClass && !t.IsAbstract && !t.IsGenericTypeDefinition &&
-                t.GetInterfaces().Where(i => i.IsGenericType).Select(i => i.GetGenericTypeDefinition()).Any(t => t.Equals(typeof(IBusinessValidator<>)))
-                ).Select(t => new
-                {
-                    Abstraction = t.GetInterfaces().Where(i => i.GetGenericTypeDefinition().Equals(typeof(IBusinessValidator<>))).First(),
-                    Implementation = t
-                }));
+                .Where(typ => typ.IsClass && !typ.IsAbstract && !typ.IsGenericTypeDefinition &&
+                    typ.GetInterfaces()
+                        .Where(intface => intface.IsGenericType)
+                        .Select(intface => intface.GetGenericTypeDefinition())
+                        .Any(typ => typ.Equals(typeof(IBusinessValidator<>))))
+                .SelectMany(typ => typ.GetInterfaces()
+                    .Where(intface => intface.GetGenericTypeDefinition().Equals(typeof(IBusinessValidator<>)))
+                    .Select(intface => new
+                    {
+                        Abstraction = intface,
+                        Implementation = typ
+                    })));
 
             foreach (var type in types)
             {
@@ -46,12 +52,18 @@ namespace BusinessValidation.Extensions
         public static IServiceCollection AddBusinessValidation(this IServiceCollection services, Assembly assembly, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
             var types = assembly.GetExportedTypes()
-                .Where(t => t.IsClass && !t.IsAbstract && !t.IsGenericTypeDefinition &&
-                t.GetInterfaces().Where(i => i.IsGenericType).Select(i => i.GetGenericTypeDefinition()).Any(t => t.Equals(typeof(IBusinessValidator<>)))).Select(t => new
-                {
-                    Abstraction = t.GetInterfaces().Where(i => i.GetGenericTypeDefinition().Equals(typeof(IBusinessValidator<>))).First(),
-                    Implementation = t
-                });
+                .Where(typ => typ.IsClass && !typ.IsAbstract && !typ.IsGenericTypeDefinition &&
+                    typ.GetInterfaces()
+                        .Where(intface => intface.IsGenericType)
+                        .Select(intface => intface.GetGenericTypeDefinition())
+                        .Any(typ => typ.Equals(typeof(IBusinessValidator<>))))
+                .SelectMany(typ => typ.GetInterfaces()
+                    .Where(intface => intface.GetGenericTypeDefinition().Equals(typeof(IBusinessValidator<>)))
+                    .Select(intface => new
+                    {
+                        Abstraction = intface,
+                        Implementation = typ
+                    }));
 
             foreach (var type in types)
             {
