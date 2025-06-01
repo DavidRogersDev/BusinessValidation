@@ -6,7 +6,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '16:00'
-      timezone: 'australia/adelaide'
+      timezone: 'Australia/Adelaide'
 
   - package-ecosystem: 'nuget'
     directory: '/src/BusinessValidation'
@@ -14,7 +14,7 @@ updates:
       interval: 'weekly'
       day: 'monday'
       time: '17:00'
-      timezone: 'australia/adelaide'
+      timezone: 'Australia/Adelaide'
     groups:
       xunit:
         patterns:
