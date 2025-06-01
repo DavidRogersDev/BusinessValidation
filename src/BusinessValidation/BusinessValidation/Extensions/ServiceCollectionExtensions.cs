@@ -48,7 +48,7 @@ namespace BusinessValidation.Extensions
         /// <param name="services">Type: <see cref="IServiceCollection"/>. The abstraction for Microsoft's IOC implementation.</param>
         /// <param name="assemblies">Type: <see cref="Assembly"/>. The assembly to scan.</param>
         /// <param name="serviceLifetime">Type: <see cref="ServiceLifetime"/>. The lifetime for the registration with the IOC.</param>
-        /// /// <returns>A <see cref="IServiceCollection "/>, being the object which has been extended.</returns>
+        /// <returns>A <see cref="IServiceCollection "/>, being the object which has been extended.</returns>
         public static IServiceCollection AddBusinessValidation(this IServiceCollection services, Assembly assembly, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
             var types = assembly.GetExportedTypes()

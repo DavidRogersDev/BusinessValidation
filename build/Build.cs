@@ -2,8 +2,6 @@
 using Invariants;
 using Nuke.Common;
 using Nuke.Common.CI.AzurePipelines;
-using Nuke.Common.Execution;
-using Nuke.Common.Execution.Theming;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;

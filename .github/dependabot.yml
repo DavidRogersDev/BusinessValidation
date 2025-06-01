@@ -13,7 +13,7 @@ updates:
     schedule:
       interval: 'weekly'
       day: 'monday'
-      time: '16:00'
+      time: '17:00'
       timezone: 'australia/adelaide'
     groups:
       xunit:

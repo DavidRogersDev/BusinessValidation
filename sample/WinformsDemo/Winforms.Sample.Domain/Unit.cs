@@ -1,10 +1,11 @@
-﻿namespace AthleteDomain
+﻿using System;
+using System.Linq;
+
+namespace Winforms.Sample.Domain
 {
-    public class Athlete
+    public class Unit
     {
         public int Id { get; set; }
-        public Guid Team { get; set; }
         public string Name { get; set; }
-
     }
 }

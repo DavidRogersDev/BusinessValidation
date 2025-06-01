@@ -9,10 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessValidation.Tests", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\..\build\_build.csproj", "{F56862D7-0F4F-4628-8255-3D95508B38CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{3AD97AD1-5630-4246-BB9F-240F9E713A86}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AthleteDomain", "AthleteDomain\AthleteDomain.csproj", "{725B35CE-7BF6-495A-9467-0E9B6C1AEA4F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,14 +25,6 @@ Global
 		{288076B7-ACBB-4A14-993B-49D45EAF4080}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F56862D7-0F4F-4628-8255-3D95508B38CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F56862D7-0F4F-4628-8255-3D95508B38CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AD97AD1-5630-4246-BB9F-240F9E713A86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3AD97AD1-5630-4246-BB9F-240F9E713A86}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3AD97AD1-5630-4246-BB9F-240F9E713A86}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3AD97AD1-5630-4246-BB9F-240F9E713A86}.Release|Any CPU.Build.0 = Release|Any CPU
-		{725B35CE-7BF6-495A-9467-0E9B6C1AEA4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{725B35CE-7BF6-495A-9467-0E9B6C1AEA4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{725B35CE-7BF6-495A-9467-0E9B6C1AEA4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{725B35CE-7BF6-495A-9467-0E9B6C1AEA4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
