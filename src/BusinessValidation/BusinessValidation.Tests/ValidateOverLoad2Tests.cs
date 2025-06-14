@@ -1,5 +1,6 @@
 ﻿using BusinessValidation.Tests.TestDomain;
-using BusinessValidation.Tests.TestDomain.Builders;
+
+using BusinessValidation.Tests.TestDomain.Generators;
 
 namespace BusinessValidation.Tests
 {
@@ -10,7 +11,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 ValidationInvariables.FailBundle.FirstName,
@@ -27,7 +28,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 ValidationInvariables.FailBundle.Email,
@@ -44,7 +45,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             var isValid = validator.Validate(
                 ValidationInvariables.FailBundle.Email,
@@ -61,7 +62,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             var isValid = validator.Validate(
                 ValidationInvariables.FailBundle.Email,
@@ -93,7 +94,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 string.Empty,
@@ -111,7 +112,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             Should.Throw<ArgumentException>(() => validator.Validate(
                     ValidationInvariables.FailBundle.NullFailBundle,
@@ -126,7 +127,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             Should.Throw<ArgumentNullException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,
@@ -141,7 +142,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
 
             Should.Throw<ArgumentException>(() => validator.Validate(
@@ -156,7 +157,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             Should.Throw<ArgumentException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,

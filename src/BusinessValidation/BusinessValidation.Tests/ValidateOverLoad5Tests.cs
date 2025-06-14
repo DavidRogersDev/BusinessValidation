@@ -1,4 +1,6 @@
-﻿using BusinessValidation.Tests.TestDomain.Builders;
+﻿
+using BusinessValidation.Tests.TestDomain;
+using BusinessValidation.Tests.TestDomain.Generators;
 using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
@@ -12,14 +14,14 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 FirstNameKey,
                 FailureMessage.NotRightNameErrorMessage,
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.FirstName.Equals(LecturerBuilder.LecturerFirstName);
                 });
 
@@ -36,7 +38,7 @@ namespace BusinessValidation.Tests
                 FailureMessage.NotRightNameEmail,
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.CurrentlyRostered.Equals(false);
                 });
 
@@ -53,7 +55,7 @@ namespace BusinessValidation.Tests
                 FailureMessage.NotRightNameEmail,
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.FirstName.Equals(LecturerBuilder.LecturerFirstName);
                 });
 
@@ -70,7 +72,7 @@ namespace BusinessValidation.Tests
                 FailureMessage.NotRightNameEmail,
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.EmailAddress.EndsWith(GenericTestData.AnuUniSuffix);
                 });
 
@@ -88,7 +90,7 @@ namespace BusinessValidation.Tests
                 FailureMessage.MessageIsNullValue,
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.FirstName.Length > 4;
                 }));
         }
@@ -103,7 +105,7 @@ namespace BusinessValidation.Tests
                 "      ",
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.FirstName.Length > 4;
                 }));
         }
@@ -118,7 +120,7 @@ namespace BusinessValidation.Tests
                 string.Empty,
                 () =>
                 {
-                    var bob = LecturerBuilder.Simple().Build();
+                    var bob = LecturerGenerator.GenerateSimple();
                     return bob.FirstName.Length > 4;
                 }));
         }

@@ -1,5 +1,6 @@
 ﻿using BusinessValidation.Tests.TestDomain;
-using BusinessValidation.Tests.TestDomain.Builders;
+
+using BusinessValidation.Tests.TestDomain.Generators;
 using System;
 using System.Linq;
 using static BusinessValidation.Tests.ValidationInvariables;
@@ -13,7 +14,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate<Lecturer, string>(
                 f => f.FirstName,
@@ -29,7 +30,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate<Lecturer, bool>(
                 f => f.CurrentlyRostered,
@@ -45,7 +46,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             var isValid = validator.Validate<Lecturer, string>(
                 l => l.EmailAddress,
@@ -61,7 +62,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             var isValid = validator.Validate<Lecturer, string>(
                 l => l.EmailAddress,
@@ -77,7 +78,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.SimpleWithAddress().Build();
+            var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             var isValid = validator.Validate<Lecturer, int>(
                 l => l.Address.PostCode,
@@ -94,7 +95,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.SimpleWithAddress().Build();
+            var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             var isValid = validator.Validate<Lecturer, int>(
                 l => l.Address.PostCode,
