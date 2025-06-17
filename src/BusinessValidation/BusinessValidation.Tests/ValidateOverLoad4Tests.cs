@@ -1,5 +1,6 @@
 ﻿using BusinessValidation.Tests.TestDomain;
-using BusinessValidation.Tests.TestDomain.Builders;
+
+using BusinessValidation.Tests.TestDomain.Generators;
 using static BusinessValidation.Tests.ValidationInvariables;
 
 namespace BusinessValidation.Tests
@@ -11,7 +12,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 f => f.FirstName,
@@ -28,7 +29,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 f => f.CurrentlyRostered,
@@ -45,7 +46,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             var isValid = validator.Validate(
                 l => l.EmailAddress,
@@ -62,7 +63,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             var isValid = validator.Validate(
                 l => l.EmailAddress,
@@ -79,7 +80,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.SimpleWithAddress().Build();
+            var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             validator.Validate(
                 l => l.Address.PostCode,
@@ -96,7 +97,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.SimpleWithAddress().Build();
+            var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             validator.Validate(
                 l => l.Address.PostCode,
@@ -114,7 +115,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.SimpleWithAddress().Build();
+            var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             validator.Validate(
                 l => l.Address.PostCode,
@@ -146,7 +147,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             Should.Throw<ArgumentNullException>(() => validator.Validate(
                 f => f.FirstName,
@@ -160,7 +161,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             Should.Throw<ArgumentException>(() => validator.Validate(
                 f => f.FirstName,
@@ -174,7 +175,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             Should.Throw<ArgumentException>(() => validator.Validate(
                 f => f.FirstName,
@@ -188,7 +189,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 p => p.FirstName,
@@ -205,7 +206,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            var bob = LecturerBuilder.Simple().Build();
+            var bob = LecturerGenerator.GenerateSimple();
 
             validator.Validate(
                 f => f.FirstName,
@@ -214,7 +215,7 @@ namespace BusinessValidation.Tests
                 bob.FirstName.Length > 3
                 );
 
-            validator[FailBundle.FirstName].Single().ShouldBe($"The FirstName 'Bob' {PartMessage.LongerThanThreeChars}");
+            validator[FailBundle.FirstName].Single().ShouldBe($"The FirstName 'bob' {PartMessage.LongerThanThreeChars}");
         }
     }
 }

@@ -143,7 +143,6 @@ internal class Build : NukeBuild
             .SetTitle(Solution.BusinessValidation.Name)
             .SetVersion(GitVersion.NuGetVersion)
             .SetRepositoryType(AzurePipelinesRepositoryType.Git.ToString().ToLowerInvariant())
-            .SetPackageReleaseNotes(ReleaseNotes)
             .SetPackageProjectUrl(PackageValue.ProjectUrl)
             .SetAuthors(PackageValue.Author)
             .SetProperty(PackageProperty.PackageLicenseExpression, PackageValue.MITLicence)
