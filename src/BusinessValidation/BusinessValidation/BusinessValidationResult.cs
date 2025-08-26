@@ -72,5 +72,38 @@ namespace BusinessValidation
 
             return new BusinessValidationResult(newValidator);
         }
+
+        public static implicit operator bool(BusinessValidationResult businessValidationResult)
+        {
+            if (businessValidationResult is null)
+            {
+                throw new ArgumentNullException(nameof(businessValidationResult));
+            }
+
+            return businessValidationResult.IsValid;
+        }
+
+        public static bool operator true(BusinessValidationResult businessValidationResult)
+        {
+            return businessValidationResult;
+        }
+
+        public static bool operator false(BusinessValidationResult businessValidationResult)
+        {
+            return !businessValidationResult;
+        }
+
+        /// <summary>
+        /// String indexer. Fail-bundle key.
+        /// </summary>
+        /// <param name="index">Index of item to retrieve.</param>
+        /// <returns>List of failure messages for the fail-bundle.</returns>
+        public IReadOnlyList<string> this[string index]
+        {
+            get
+            {
+                return ValidationFailures[index];
+            }
+        }
     }
 }

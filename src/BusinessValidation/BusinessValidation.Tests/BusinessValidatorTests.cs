@@ -9,6 +9,7 @@ namespace BusinessValidation.Tests
     {
         private const string StudentErrorMessage = "Id must have a positive value.";
         private const string SubjectErrorMessage = "Name must be less than 100 characters long.";
+        private const string FailBundleName = "Name";
         private readonly Assembly _assembly;
         private readonly IServiceCollection _services;
 
@@ -31,6 +32,7 @@ namespace BusinessValidation.Tests
             BusinessValidationResult result = subjectValidator.Validate(subject);
 
             result.IsValid.ShouldBeTrue();
+            Assert.True(result);
         }
         
         [Fact]
@@ -46,7 +48,24 @@ namespace BusinessValidation.Tests
             BusinessValidationResult result = subjectValidator.Validate(subject);            
 
             result.NotValid.ShouldBeTrue();
-            result.ValidationFailures.SelectMany(f => f.Value).ShouldContain(SubjectErrorMessage );
+            result.ValidationFailures.SelectMany(f => f.Value).ShouldContain(SubjectErrorMessage);
+        }
+        
+        [Fact]
+        public void BusinessValidator_Failure_Should_Be_Accessible_By_Indexer()
+        {
+            IServiceCollection services = _services.AddBusinessValidation(_assembly);
+            IServiceProvider container = services.BuildServiceProvider();
+
+            IBusinessValidator<Subject> subjectValidator = container.GetRequiredService<IBusinessValidator<Subject>>();
+
+            Subject subject = new Subject { Id = 1, Name = StringGenerator.GetString2(100) };
+
+            BusinessValidationResult result = subjectValidator.Validate(subject);            
+
+            Assert.False(result);
+            IReadOnlyList<string> errorsList = result[FailBundleName];
+            errorsList.ShouldContain(SubjectErrorMessage);
         }
         
         [Fact]
