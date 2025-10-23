@@ -15,6 +15,7 @@ jobs:
         dotnet-version: ['9.0.x']
     steps:
       - name: Checkout Code 🛒
+        if: ${{ github.ref_type == 'branch' }}
         shell: bash
         run: |
           echo "${{github.head_ref}}"
