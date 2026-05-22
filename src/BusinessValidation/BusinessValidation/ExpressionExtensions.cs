@@ -40,13 +40,16 @@ namespace BusinessValidation
                 path.Insert(0, memberExpression.Member.Name);
                 insertDot = true;
 
+                if (ReferenceEquals(memberExpression.Expression, null))
+                    break;
+
                 memberExpression = GetMemberExpression(memberExpression.Expression);
             }
 
             return path.ToString();
         }
 
-        internal static MemberExpression GetMemberExpression(Expression expression)
+        internal static MemberExpression? GetMemberExpression(Expression expression)
         {
             if (expression is MemberExpression)
             {

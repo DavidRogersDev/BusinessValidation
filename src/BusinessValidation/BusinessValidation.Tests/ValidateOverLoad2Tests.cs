@@ -79,7 +79,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Lecturer bob = null;
+            Lecturer bob = null!;
 
             Should.Throw<ArgumentNullException>(() => validator.Validate(
                 ValidationInvariables.FailBundle.Email,

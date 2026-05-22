@@ -8,6 +8,8 @@
         <NukeRootDirectory>..</NukeRootDirectory>
         <NukeScriptDirectory>..</NukeScriptDirectory>
         <NukeTelemetryVersion>1</NukeTelemetryVersion>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>		
     </PropertyGroup>
 
     <ItemGroup>
