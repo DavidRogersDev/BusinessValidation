@@ -16,7 +16,7 @@
             internal const string Email = "Email";
             internal const string FirstName = "FirstName";
             internal const string Name = "Name";
-            internal static readonly string NullFailBundle = null;
+            internal static readonly string NullFailBundle = null!;
             internal const string PostCode = "PostCode";
         }
 
@@ -28,7 +28,7 @@
         internal static class FailureMessage
         {
             internal const string FailMessageNameTooShort = "Name too short";
-            internal static readonly string MessageIsNullValue = null;
+            internal static readonly string MessageIsNullValue = null!;
             internal const string NotRightNameEmail = "Not the right email";
             internal const string NotRightNameErrorMessage = "Not the right name";
             internal const string PersonTooYoung = "Person is too young";

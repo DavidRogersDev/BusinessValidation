@@ -81,9 +81,9 @@ namespace BusinessValidation.Tests
             var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             var isValid = validator.Validate<Lecturer, int>(
-                l => l.Address.PostCode,
+                l => l.Address!.PostCode,
                 FailureMessage.PostCodeTooFar,
-                bob.Address.PostCode > 5000,
+                bob.Address!.PostCode > 5000,
                 PropertyDepth.FullPath
                 );
 
@@ -98,9 +98,9 @@ namespace BusinessValidation.Tests
             var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             var isValid = validator.Validate<Lecturer, int>(
-                l => l.Address.PostCode,
+                l => l.Address!.PostCode,
                 FailureMessage.PostCodeTooFar,
-                bob.Address.PostCode > 5000,
+                bob.Address!.PostCode > 5000,
                 PropertyDepth.TerminatingProperty
                 );
 

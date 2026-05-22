@@ -73,7 +73,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Should.Throw<ArgumentNullException>(() => validator.Validate(FailBundle.Email, null, GenericTestData.VeryShortName.Length > 2));
+            Should.Throw<ArgumentNullException>(() => validator.Validate(FailBundle.Email, null!, GenericTestData.VeryShortName.Length > 2));
 
         }
 

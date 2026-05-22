@@ -1,4 +1,5 @@
-﻿using BusinessValidation.Tests.TestDomain;
+﻿#pragma warning disable CS0618
+using BusinessValidation.Tests.TestDomain;
 
 using BusinessValidation.Tests.TestDomain.Generators;
 using static BusinessValidation.Tests.ValidationInvariables;
@@ -83,10 +84,10 @@ namespace BusinessValidation.Tests
             var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             validator.Validate(
-                l => l.Address.PostCode,
+                l => l.Address!.PostCode,
                 FailureMessage.PostCodeTooFar,
                 bob,
-                bob.Address.PostCode > 5000
+                bob.Address!.PostCode > 5000
                 );
 
             validator.ValidationFailures.Single().Key.ShouldBe(FailBundle.AddressPostcode);
@@ -100,10 +101,10 @@ namespace BusinessValidation.Tests
             var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             validator.Validate(
-                l => l.Address.PostCode,
+                l => l.Address!.PostCode,
                 FailureMessage.PostCodeTooFar,
                 bob,
-                bob.Address.PostCode > 5000,
+                bob.Address!.PostCode > 5000,
                 PropertyDepth.FullPath
                 );
 
@@ -118,10 +119,10 @@ namespace BusinessValidation.Tests
             var bob = LecturerGenerator.GenerateSimpleWithAddress();
 
             validator.Validate(
-                l => l.Address.PostCode,
+                l => l.Address!.PostCode,
                 FailureMessage.PostCodeTooFar,
                 bob,
-                bob.Address.PostCode > 5000,
+                bob.Address!.PostCode > 5000,
                 PropertyDepth.TerminatingProperty
                 );
 
@@ -133,7 +134,7 @@ namespace BusinessValidation.Tests
         {
             var validator = new Validator();
 
-            Lecturer bob = null;
+            Lecturer? bob = null!;
 
             Should.Throw<ArgumentNullException>(() => validator.Validate(
                 f => f.EmailAddress,
