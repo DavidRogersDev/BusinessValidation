@@ -11,13 +11,28 @@ echo "**************************************************************************
 echo "Print"
 echo "*******************************************************************************************************************************************************************************"
 echo "Root Directory: $GITHUB_WORKSPACE"
-echo "assemblySemVer: $assemblySemVer"
+echo "AssemblySemVer: $assemblySemVer"
 echo "Major Minor Patch: $majorMinorPatch"
 echo "PreReleaseLabel: $preReleaseLabel"
+echo "InformationalVersion: $informationalVersion"
+echo "SemVer: $semVer"
 echo "*******************************************************************************************************************************************************************************"
 echo "Clean"
 echo "*******************************************************************************************************************************************************************************"
 # need to test if these exist and delete them if they do.
+if [ -d "$artifacts_directory" ]; then
+  echo "Directory exists."
+else
+  echo "Directory does not exist."
+fi
+
+if [ -d "$nuget_directory" ]; then
+  echo "Directory exists."
+else
+  echo "Directory does not exist."
+fi
+
+
 mkdir $artifacts_directory
 mkdir $nuget_directory
 echo "*******************************************************************************************************************************************************************************"
