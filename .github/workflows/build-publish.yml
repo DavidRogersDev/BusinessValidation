@@ -50,3 +50,9 @@ jobs:
           artifacts_directory="$GITHUB_WORKSPACE/$artifacts_subdirectory"
           nuget_directory="$artifacts_directory/nuget"
           echo "$nuget_directory"
+          mkdir $artifacts_directory
+          mkdir $nuget_directory
+      - name: build it
+        run: |
+          cd "$DOTNET_ROOT"
+          dotnet --version
