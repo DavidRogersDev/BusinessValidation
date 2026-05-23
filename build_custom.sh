@@ -11,13 +11,9 @@ echo "**************************************************************************
 echo "Print"
 echo "*******************************************************************************************************************************************************************************"
 echo "Root Directory: $GITHUB_WORKSPACE"
-echo "Major Minor Patch = $MajorMinorPatch"
-echo "PreReleaseLabel = $PreReleaseLabel"
-echo $nuget_directory
-echo $publish_directory_NET5
-echo $soln_path
-echo $proj_path
-echo $test_proj_path
+echo "assemblySemVer: $assemblySemVer"
+echo "Major Minor Patch: $majorMinorPatch"
+echo "PreReleaseLabel: $preReleaseLabel"
 echo "*******************************************************************************************************************************************************************************"
 echo "Clean"
 echo "*******************************************************************************************************************************************************************************"
