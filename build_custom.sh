@@ -13,5 +13,5 @@ echo $soln_path
 echo $proj_path
 echo $test_proj_path
 dotnet restore $soln_path
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=${{ steps.gitversion.outputs.AssemblySemVer }} --property:FileVersion=${{ steps.gitversion.outputs.MajorMinorPatch }} --property:Version=${{ steps.gitversion.outputs.SemVer }} --property:InformationalVersion=${{ steps.gitversion.outputs.InformationalVersion }} --framework net5.0
-dotnet publish $test_proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=${{ steps.gitversion.outputs.AssemblySemVer }} --property:FileVersion=${{ steps.gitversion.outputs.MajorMinorPatch }} --property:Version=${{ steps.gitversion.outputs.SemVer }} --property:InformationalVersion=${{ steps.gitversion.outputs.InformationalVersion }} --framework net5.0
+dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --framework net5.0
+dotnet publish $test_proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --framework net5.0
