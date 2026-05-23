@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 5
     strategy:
       matrix:
-        dotnet-version: ['9.0.x']
+        dotnet-version: ['10.0.x']
     steps:
       - name: Checkout Code 🛒
         uses: actions/checkout@v6
@@ -32,13 +32,15 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
       - name: Display dotnet version 🆚
         run: dotnet --version
-      - name: Run nuke 🚀
-        shell: bash
-        env:
-          PackagesNugetApiKey: ${{ secrets.NUGET_API_KEY }}
-          PackagesNugetApiUrl: ${{ vars.PACKAGES_NUGET_URL }}
-          NugetOrgNugetApiKey: ${{ secrets.NUGETORG_API_KEY }}
-          NugetOrgNugetApiUrl: ${{ vars.NUGETORG_NUGET_URL }}
-          ReleaseNotes: ${{ vars.RELEASE_NOTES }}
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v1.1.1
+        with:
+          versionSpec: '6.0.x' # Or specify '6.0.x' for latest
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v1.1.1
+      - name: Use Version
         run: |
-          ./build.sh
+          echo "The calculated version is: ${{ steps.gitversion.outputs.semVer }}"
+          echo "Major.Minor.Patch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
+          echo $GITHUB_WORKSPACE
