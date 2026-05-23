@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-artifacts_directory="$GITHUB_WORKSPACE/artifacts"
-nuget_directory="$artifacts_directory/nuget"
+#artifacts_directory="$GITHUB_WORKSPACE/artifacts"
+#nuget_directory="$artifacts_directory/nuget"
 source_directory="$GITHUB_WORKSPACE/src/BusinessValidation"
 publish_directory_NET5="$source_directory/BusinessValidation/bin/Release/net5.0/publish"
 soln_path="$source_directory/BusinessValidation.sln"
