@@ -44,3 +44,11 @@ jobs:
           echo "The calculated version is: ${{ steps.gitversion.outputs.semVer }}"
           echo "Major.Minor.Patch: ${{ steps.gitversion.outputs.majorMinorPatch }}"
           echo $GITHUB_WORKSPACE
+      - name: make directories
+        run: |
+          $artifacts_directory= $GITHUB_WORKSPACE + "/artifacts"
+          $nuget_directory = $artifacts_directory + "/nuget"
+          cd $nuget_directory
+          touch some_file.txt
+          "hi dave" > some_file.txt
+          cat some_file.txt
