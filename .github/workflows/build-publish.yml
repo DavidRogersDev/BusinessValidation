@@ -54,4 +54,5 @@ jobs:
           mkdir $nuget_directory
       - name: build it
         run: |
+          chmod=+x ./build_custom.sh
           ./build_custom.sh
