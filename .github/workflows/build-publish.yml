@@ -57,4 +57,4 @@ jobs:
           proj_path="$GITHUB_WORKSPACE/src/BusinessValidation/BusinessValidation"
           cd "$DOTNET_ROOT"
           dotnet --version
-          dotnet "$proj_path/BusinessValidation.csproj" --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemVer }} --property:FileVersion=${{ steps.gitversion.outputs.majorMinorPatch }} --property:Version=${{ steps.gitversion.outputs.semVer }} --property:InformationalVersion=${{ steps.gitversion.outputs.informationalVersion }} --framework net5.0
+          dotnet publish "$proj_path/BusinessValidation.csproj" --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=${{ steps.gitversion.outputs.assemblySemVer }} --property:FileVersion=${{ steps.gitversion.outputs.majorMinorPatch }} --property:Version=${{ steps.gitversion.outputs.semVer }} --property:InformationalVersion=${{ steps.gitversion.outputs.informationalVersion }} --framework net5.0
