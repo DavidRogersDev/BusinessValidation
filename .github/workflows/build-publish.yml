@@ -46,7 +46,8 @@ jobs:
           echo $GITHUB_WORKSPACE
       - name: make directories
         run: |
-          $artifacts_directory="$GITHUB_WORKSPACE" + "/artifacts"
-          $nuget_directory="$artifacts_directory" + "/nuget"
-          echo "DOTNET_ROOT"
+          artifacts_subdirectory="artifacts"
+          artifacts_directory="$GITHUB_WORKSPACE/$artifacts_subdirectory"
+          $nuget_directory="$artifacts_directory/nuget"
+          echo "$DOTNET_ROOT"
           echo "$artifacts_directory"
