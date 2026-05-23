@@ -49,5 +49,4 @@ jobs:
           artifacts_subdirectory="artifacts"
           artifacts_directory="$GITHUB_WORKSPACE/$artifacts_subdirectory"
           $nuget_directory="$artifacts_directory/nuget"
-          echo "$DOTNET_ROOT"
-          echo "$artifacts_directory"
+          echo "$nuget_directory"
