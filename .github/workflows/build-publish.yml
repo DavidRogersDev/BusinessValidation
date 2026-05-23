@@ -46,9 +46,11 @@ jobs:
           echo $GITHUB_WORKSPACE
       - name: make directories
         run: |
-          $artifacts_directory= $GITHUB_WORKSPACE + "/artifacts"
-          $nuget_directory = $artifacts_directory + "/nuget"
-          cd $nuget_directory
+          $artifacts_directory= "$GITHUB_WORKSPACE" + "/artifacts"
+          $nuget_directory = "$artifacts_directory" + "/nuget"
+          echo "DOTNET_ROOT"
+          echo "$artifacts_directory"
+          cd "$nuget_directory"
           touch some_file.txt
           "hi dave" > some_file.txt
           cat some_file.txt
