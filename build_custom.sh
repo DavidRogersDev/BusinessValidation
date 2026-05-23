@@ -13,5 +13,5 @@ echo $soln_path
 echo $proj_path
 echo $test_proj_path
 dotnet restore $soln_path
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --framework net5.0
-dotnet publish $test_proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --framework net9.0
+dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$0 --property:FileVersion=$1 --property:Version=$2 --property:InformationalVersion=$3 --framework net5.0
+dotnet publish $test_proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$0 --property:FileVersion=$1 --property:Version=$2 --property:InformationalVersion=$3 --framework net9.0

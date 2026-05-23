@@ -53,11 +53,6 @@ jobs:
           mkdir $artifacts_directory
           mkdir $nuget_directory
       - name: build it
-        env:
-          AssemblySemVer: ${{ steps.gitversion.outputs.AssemblySemVer }}
-          InformationalVersion: ${{ steps.gitversion.outputs.InformationalVersion }}
-          MajorMinorPatch: ${{ steps.gitversion.outputs.MajorMinorPatch }}
-          SemVer: ${{ steps.gitversion.outputs.SemVer }}
         run: |
           chmod +x ./build_custom.sh
-          ./build_custom.sh $AssemblySemVer $MajorMinorPatch $SemVer $InformationalVersion
+          ./build_custom.sh $assemblySemVer $majorMinorPatch $semVer $informationalVersion
