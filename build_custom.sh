@@ -92,4 +92,4 @@ echo $nugetfilename
 echo "***********************************"
 echo "Push Nuget Packages"
 echo "***********************************"
-dotnet nuget push $nuget_directory/$nugetfilename --source https://nuget.pkg.github.com/DavidRogersDev/index.json --api-key $PackagesNugetApiKey
+dotnet nuget push $nugetfilename --source https://nuget.pkg.github.com/DavidRogersDev/index.json --api-key $PackagesNugetApiKey
