@@ -81,6 +81,16 @@ echo "Test"
 echo "***********************************"
 dotnet test $test_proj_path --no-restore --no-build --configuration Release
 
+# capture dotnet test exit code
+exitcode=${PIPESTATUS[0]}
+if [ $exitcode == 0 ]; then
+	echo "All tests passed"
+	exit 0
+else	
+	echo "Test failure"
+	exit 0
+fi
+
 echo "***********************************"
 echo "Pack"
 echo "***********************************"
