@@ -86,7 +86,7 @@ echo "Pack"
 echo "***********************************"
 
 dotnet pack $proj_path --configuration Release --no-build --no-restore --no-dependencies --property:PackageId=BusinessValidation --property:Title=BusinessValidation --property:Version=$3 --property:RepositoryType=git --property:PackageProjectUrl=https://github.com/DavidRogersDev/BusinessValidation --property:Authors="David Rogers" --property:PackageLicenseExpression=MIT --property:PackageTags="BusinessValidation Business-Validation Business-Validators Business-Validator Validation Validator Validators" --property:PackageRequireLicenseAcceptance=false --property:Description="A library to perform validation in business services and give a mechanism to report failures back to the user interface." --property:RepositoryUrl=https://github.com/DavidRogersDev/BusinessValidation.git --property:RepositoryBranch=main --property:RepositoryCommit=778ffa79441eef5267ee3e8ae5b5874f315f68a7 --property:Copyright="David Rogers 2022 - 2026" --property:PackageReadmeFile=readme.md --property:PackageIcon=icon.png --output $nuget_directory
-nugetfilename = $(ls $nuget_directory/*.nupkg) 
+nugetfilename=$(ls $nuget_directory/*.nupkg) 
 echo $nugetfilename
 
 echo "***********************************"
