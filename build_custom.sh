@@ -11,6 +11,7 @@ test_proj_path="$source_directory/BusinessValidation.Tests/BusinessValidation.Te
 isTaggedBuild=false
 push_package_to_github=
 push_package_to_nuget=
+compileexitcode=0
 
 # next 3 if-else statements set some variables which are used to determine whether to take certain actions or not e.g. push to Nuget
 isTaggedBuild=false
@@ -75,16 +76,27 @@ else
 	exit 1
 fi
 
-echo "***********************************"
-echo "Compile"
-echo "***********************************"
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net5.0
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net6.0
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net7.0
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net8.0
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net9.0
-dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net10.0
-dotnet publish $test_proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net9.0
+if [ $restoreexitcode == 0 ]; then
+
+	echo "***********************************"
+	echo "Compile"
+	echo "***********************************"
+	dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net5.0
+	dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net6.0
+	dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net7.0
+	dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net8.0
+	dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net9.0
+	dotnet publish $proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net10.0
+	dotnet publish $test_proj_path --no-restore --configuration Release --property:Copyright="David Rogers 2022 - 2026" --property:AssemblyVersion=$1 --property:FileVersion=$2 --property:Version=$3 --property:InformationalVersion=$4 --framework net9.0
+
+	# capture dotnet restore exit code
+	$compileexitcode=${PIPESTATUS[0]}
+	if [ $compileexitcode == 0 ]; then
+		echo "Compile succeeded"
+	else	
+		echo "Compile failure"		
+	fi
+fi
 
 echo "***********************************"
 echo "Test"
