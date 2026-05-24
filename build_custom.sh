@@ -88,7 +88,7 @@ if [ $exitcode == 0 ]; then
 	exit 0
 else	
 	echo "Test failure"
-	exit 0
+	exit 1
 fi
 
 echo "***********************************"

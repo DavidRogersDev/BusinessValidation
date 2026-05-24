@@ -32,7 +32,8 @@ namespace BusinessValidation.Tests
             BusinessValidationResult result = subjectValidator.Validate(subject);
 
             result.IsValid.ShouldBeTrue();
-            Assert.True(result);
+            //Assert.True(result);
+            Assert.False(result);
         }
         
         [Fact]
