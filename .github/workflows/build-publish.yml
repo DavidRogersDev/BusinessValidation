@@ -40,6 +40,12 @@ jobs:
         id: gitversion
         uses: gittools/actions/gitversion/execute@v1.1.1
       - name: build it 👷
+        env:
+          PackagesNugetApiKey: ${{ secrets.NUGET_API_KEY }}
+          PackagesNugetApiUrl: ${{ vars.PACKAGES_NUGET_URL }}
+          NugetOrgNugetApiKey: ${{ secrets.NUGETORG_API_KEY }}
+          NugetOrgNugetApiUrl: ${{ vars.NUGETORG_NUGET_URL }}
+          ReleaseNotes: ${{ vars.RELEASE_NOTES }}
         run: |
           chmod +x ./build_custom.sh
           ./build_custom.sh $assemblySemVer $majorMinorPatch $semVer $informationalVersion
