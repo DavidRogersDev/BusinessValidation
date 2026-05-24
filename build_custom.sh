@@ -66,6 +66,16 @@ echo "Restore"
 echo "***********************************"
 dotnet restore $soln_path
 
+# capture dotnet restore exit code
+restoreexitcode=${PIPESTATUS[0]}
+if [ $restoreexitcode == 0 ]; then
+	echo "All tests passed"
+	exit 0
+else	
+	echo "Test failure"
+	exit 1
+fi
+
 echo "***********************************"
 echo "Compile"
 echo "***********************************"
@@ -81,6 +91,16 @@ echo "***********************************"
 echo "Test"
 echo "***********************************"
 dotnet test $test_proj_path --no-restore --no-build --configuration Release
+
+# capture dotnet test exit code
+testexitcode=${PIPESTATUS[0]}
+if [ $testexitcode == 0 ]; then
+	echo "All tests passed"
+	exit 0
+else	
+	echo "Test failure"
+	exit 1
+fi
 
 
 echo "***********************************"
