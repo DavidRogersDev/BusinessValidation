@@ -48,4 +48,4 @@ jobs:
           ReleaseNotes: ${{ vars.RELEASE_NOTES }}
         run: |
           chmod +x ./build_custom.sh
-          ./build_custom.sh $assemblySemVer $majorMinorPatch $semVer $informationalVersion
+          ./build_custom.sh $assemblySemVer $majorMinorPatch $semVer $informationalVersion $sha

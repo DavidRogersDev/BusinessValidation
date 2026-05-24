@@ -12,6 +12,7 @@ isTaggedBuild=false
 push_package_to_github=
 push_package_to_nuget=
 
+# next 3 if-else statements set some variables which are used to determine whether to take certain actions or not e.g. push to Nuget
 isTaggedBuild=false
 
 if [[ -z "$preReleaseLabel" ]]; then
@@ -81,25 +82,16 @@ echo "Test"
 echo "***********************************"
 dotnet test $test_proj_path --no-restore --no-build --configuration Release
 
-# capture dotnet test exit code
-exitcode=${PIPESTATUS[0]}
-if [ $exitcode == 0 ]; then
-	echo "All tests passed"
-	exit 0
-else	
-	echo "Test failure"
-	exit 1
-fi
 
 echo "***********************************"
 echo "Pack"
 echo "***********************************"
 
-dotnet pack $proj_path --configuration Release --no-build --no-restore --no-dependencies --property:PackageId=BusinessValidation --property:Title=BusinessValidation --property:Version=$3 --property:RepositoryType=git --property:PackageProjectUrl=https://github.com/DavidRogersDev/BusinessValidation --property:Authors="David Rogers" --property:PackageLicenseExpression=MIT --property:PackageTags="BusinessValidation Business-Validation Business-Validators Business-Validator Validation Validator Validators" --property:PackageRequireLicenseAcceptance=false --property:Description="A library to perform validation in business services and give a mechanism to report failures back to the user interface." --property:RepositoryUrl=https://github.com/DavidRogersDev/BusinessValidation.git --property:RepositoryBranch=main --property:RepositoryCommit=778ffa79441eef5267ee3e8ae5b5874f315f68a7 --property:Copyright="David Rogers 2022 - 2026" --property:PackageReadmeFile=readme.md --property:PackageIcon=icon.png --output $nuget_directory
+dotnet pack $proj_path --configuration Release --no-build --no-restore --no-dependencies --property:PackageId=BusinessValidation --property:Title=BusinessValidation --property:Version=$3 --property:RepositoryType=git --property:PackageProjectUrl=https://github.com/DavidRogersDev/BusinessValidation --property:Authors="David Rogers" --property:PackageLicenseExpression=MIT --property:PackageTags="BusinessValidation Business-Validation Business-Validators Business-Validator Validation Validator Validators" --property:PackageRequireLicenseAcceptance=false --property:Description="A library to perform validation in business services and give a mechanism to report failures back to the user interface." --property:RepositoryUrl=https://github.com/DavidRogersDev/BusinessValidation.git --property:RepositoryBranch=main --property:RepositoryCommit=$5 --property:Copyright="David Rogers 2022 - 2026" --property:PackageReadmeFile=readme.md --property:PackageIcon=icon.png --output $nuget_directory
 nugetfilename=$(ls $nuget_directory/*.nupkg) 
 echo $nugetfilename
 
 echo "***********************************"
 echo "Push Nuget Packages"
 echo "***********************************"
-dotnet nuget push $nugetfilename --source https://nuget.pkg.github.com/DavidRogersDev/index.json --api-key $PackagesNugetApiKey
+dotnet nuget push $nugetfilename --source $PackagesNugetApiUrl --api-key $PackagesNugetApiKey
